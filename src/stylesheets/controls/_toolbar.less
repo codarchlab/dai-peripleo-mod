@@ -1,0 +1,34 @@
+#toolbar {
+  position:absolute;
+  top:15px;
+  right:30px;
+  font-size:18px;
+
+  .toolbar-button {
+    box-sizing:border-box;
+    width:34px;
+    height:34px;
+    padding:8px 0;
+    background-color:#fff;
+    cursor:pointer;
+    text-align:center;
+    color:@light-grey-type;
+    .no-select();
+  }
+
+  .toolbar-group {
+    margin-bottom:6px;
+    overflow:hidden;
+    .rounded-corners(2px);
+    .box-shadow(0, 2px, 6px, 0, rgba(0,0,0,0.3));
+  }
+
+  .toolbar-button:hover {
+    background-color:#f2f2f2;
+  }
+
+  .zoom-in {
+    border-bottom: 1px solid #e6e6e6;
+  }
+
+}

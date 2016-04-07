@@ -1,0 +1,40 @@
+.filterpanel {
+  margin-top:-2px;
+  background-color:#fff;
+  .box-shadow(0, 0, 6px, 0, rgba(0,0,0,0.3));
+  .rounded-corners-bottom(2px);
+
+  .body {
+    height:200px;
+    background-color:#f2f2f2;
+    border-bottom:1px solid #e5e5e5;
+  }
+
+  .footer {
+    padding:14px 12px 11px 10px;
+    color:#686868;
+    font-size:13px;
+
+    .toggle-filters {
+      float:right;
+      color:@light-grey-type;
+      cursor:pointer;
+    }
+
+    .toggle-filters:hover {
+      color:@light-grey-type-hover;
+    }
+
+    .toggle-filters:after {
+      font-family:"FontAwesome";
+      content:'\f078';
+      padding-left:3px;
+    }
+
+    .toggle-filters.open:after {
+      content:'\f077';
+    }
+
+  }
+
+}
