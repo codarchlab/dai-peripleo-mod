@@ -1,4 +1,4 @@
-define(['events/events', 'velocity'], function(Events) {
+define(['controls/facetchart', 'events/events', 'velocity'], function(FacetChart, Events) {
 
   var SLIDE_DURATION = 180;
 
@@ -6,7 +6,12 @@ define(['events/events', 'velocity'], function(Events) {
         /** Slide-able body section **/
     var body = jQuery(
           '<div class="body">' +
-            '<div class="section"></div>' +
+            '<div data-facet="Category" class="section facet"></div>' +
+            '<div data-facet="Type" class="section facet"></div>' +
+            '<div data-facet="FormatStatus" class="section facet"></div>' +
+            '<div data-facet="Creator" class="section facet"></div>' +
+            '<div data-facet="Temporal" class="section facet"></div>' +
+            '<div data-facet="Material" class="section facet"></div>' +
           '</div>'),
 
         /** Footer (remains visible when panel slides in) **/
@@ -18,6 +23,16 @@ define(['events/events', 'velocity'], function(Events) {
           '</div>'),
 
         buttonToggleFilters = footer.find('.toggle-filters'),
+
+        /** Automatically creates facet charts & populates a lookup array based on DOM elements **/
+        facetCharts = (function() {
+          return jQuery.map(body.find('.facet'), function(el) {
+            var containerEl = jQuery(el),
+                facetField = containerEl.data('facet');
+
+            return new FacetChart(containerEl, facetField, eventBroker);
+          });
+        })(),
 
         /** Slides the panel in or out **/
         togglePanel = function() {
