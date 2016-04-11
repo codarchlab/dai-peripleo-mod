@@ -27,45 +27,11 @@ request:
 curl http://localhost:8983/solr/peripleo/update?commit=true -d  '<delete><query>*:*</query></delete>'
 ```
 
-## Indexing the sample PELAGIOS data
-
-The `data` folder contains a small sample dataset of 2.000 object records from the
-[Pelagios project](http://commons.pelagios.org). (The snippet below shows a sample data record.)
-The `scripts` folder contains a Python script for loading this data into SOLR. Run the script by
-going to the `scripts` folder and typing `python indexTestdata.py`.
-
-```json
-{  
-   "title":"Silver Antoninianus, Cyzicus, AD 282 - AD 285. 1944.100.36391",
-   "geometry":{  
-      "type":"Point",
-      "coordinates":[  
-         27.8741,
-         40.3898
-      ]
-   },
-   "object_type":"ITEM",
-   "temporal_bounds":{  
-      "to":"285-01-01",
-      "from":"282-01-01"
-   },
-   "depictions":[  
-      {  
-         "uri":"http://numismatics.org/collectionimages/19001949/1944/1944.100.36391.obv.width350.jpg"
-      },
-      {  
-         "uri":"http://numismatics.org/collectionimages/19001949/1944/1944.100.36391.rev.width350.jpg"
-      }
-   ],
-   "identifier":"8d6346ab-ee07-4f41-b16b-9f7e65c9a87b",
-   "homepage":"http://numismatics.org/collection/1944.100.36391"
-}
-```
-
 ## Indexing iDIG data
 
-This repository does not include iDIG data (bring your own). The scripts folder, however, contains
-a script to convert iDIG's key:value format to JSON. (Work in progress.)
+This repository does not include any sample iDIG data. For the time being, you'll need to bring
+your own. The `scripts` folder contains a Python script to convert iDIG's key:value format to
+JSON (`idig2json.py`) and a script for indexing the result file to SOLR (`indexData.py`).
 
 ## Hacking on the Frontend
 

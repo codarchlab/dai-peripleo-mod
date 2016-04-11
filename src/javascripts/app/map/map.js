@@ -20,7 +20,8 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
                  }),
 
           osm  : L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	                 attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+	                 attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+                   maxZoom:30
                  }),
 
           satellite : L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicGVsYWdpb3MiLCJhIjoiMWRlODMzM2NkZWU3YzkxOGJkMDFiMmFiYjk3NWZkMmUifQ.cyqpSZvhsvBGEBwRfniVrg', {
@@ -31,10 +32,10 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
         },
 
         /** Default "closeup" zoom levels per layer **/
-        closeupZoom = { dare: 11, awmc: 12, osm: 15, satellite: 17 },
+        closeupZoom = { dare: 11, awmc: 12, osm: 22, satellite: 17 },
 
         /** To keep track of current layer **/
-        currentLayer = { name: 'awmc', layer: Layers.awmc },
+        currentLayer = { name: 'OpenStreetMap', layer: Layers.osm },
 
         /** Map **/
         map = new L.Map(div, {

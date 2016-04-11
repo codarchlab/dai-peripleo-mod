@@ -105,42 +105,80 @@
 
   <fields>
     <field name="_version_" type="long" indexed="true" stored="true"/>
-    <field name="identifier" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-    <field name="object_type" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-    <field name="title" type="text" indexed="true" stored="true" required="true" multiValued="false" />
-    <field name="description" type="text" indexed="true" stored="true" multiValued="false" />
-    <field name="homepage" type="string" indexed="false" stored="true" multiValued="false" />
 
-    <!-- TODO is_in_dataset -->
+    <field name="Category" type="text" indexed="true" stored="true" />
+    <field name="Contents" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="Context" type="text" indexed="true" stored="true" />
+    <field name="Contributor" type="text" indexed="true" stored="true" />
+    <field name="Coverage" type="text" indexed="true" stored="true" />
+    <field name="Creator" type="text" indexed="true" stored="true" />
 
-    <field name="language" type="string" indexed="true" stored="true" multiValued="true" />
-    <field name="is_part_of" type="string" indexed="true" stored="true" multiValued="false" />
+    <!-- TODO  parse dates -->
 
-    <!-- TODO names -->
+    <field name="Date" type="text" indexed="true" stored="true" />
+    <field name="DateEarliest" type="text" indexed="true" stored="true" />
+    <field name="DateLatest" type="text" indexed="true" stored="true" />
+    <field name="DateTimeZone" type="text" indexed="true" stored="true" />
+    <field name="DateUTC" type="text" indexed="true" stored="true" />
+    <field name="Deposit" type="text" indexed="true" stored="true" />
+    <field name="Description" type="text" indexed="true" stored="true" />
 
-    <field name="places" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="Format" type="text" indexed="true" stored="true" />
+    <field name="FormatDiameter" type="float" indexed="true" stored="true" />
+    <field name="FormatImage" type="text" indexed="true" stored="true" />
+    <field name="FormatImageHeight" type="text" indexed="true" stored="true" />
+    <field name="FormatLocked" type="int" indexed="true" stored="true" />
+    <field name="FormatPreservedHeight" type="text" indexed="true" stored="true" />
+    <field name="FormatSidelined" type="int" indexed="true" stored="true" />
+    <field name="FormatStatus" type="text" indexed="true" stored="true" />
+    <field name="FormatTrashed" type="int" indexed="true" stored="true" />
+    <field name="FormatThickness" type="text" indexed="true" stored="true" />
 
-    <field name="geometry" type="location_rpt" indexed="true" stored="true" multiValued="true" />
+    <field name="Identifier" type="int" indexed="true" stored="true" />
+    <field name="IdentifierUUID" type="string" indexed="true" stored="true" required="true" />
+    <field name="ImageModificationDate" type="text" indexed="true" stored="true" />
 
-    <!-- TODO geometry_series: leave out for now? -->
-    <!-- TODO temporal_bounds: DateRangeField type? -->
+    <field name="Language" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="Looking" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="LotGrid" type="string" indexed="true" stored="true" multiValued="true" />
 
-    <dynamicField name="depictions.uri.*" type="string" indexed="false" stored="true" />
-    <dynamicField name="depictions.caption.*" type="text" indexed="true" stored="true" />
-    <dynamicField name="depictions.license.*" type="string" indexed="false" stored="true" />
-    <dynamicField name="depictions.creator.*" type="text" indexed="true" stored="true" />
-    <field name="fulltext" type="text" indexed="true" stored="true" multiValued="false" />
-    <field name="close_match" type="string" indexed="true" stored="true" multiValued="true" />
-    <field name="exact_match" type="string" indexed="true" stored="true" multiValued="true" />
-    <field name="is_conflation_of" type="string" indexed="false" stored="true" multiValued="false" />
+    <field name="Material" type="text" indexed="true" stored="true" />
 
-    <field name="text" type="text" indexed="true" stored="false" multiValued="true" />
+    <field name="NotebookPage" type="int" indexed="true" stored="true" multiValued="true" />
+
+    <field name="Objects" type="text" indexed="true" stored="true" />
+
+    <field name="Photographer" type="text" indexed="true" stored="true" />
+
+    <field name="RelationBelongsTo" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="RelationBelongsToUUID" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="RelationIncludes" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="RelationIncludesUUID" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="RelationIsAboveUUID" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="RelationIsBelowUUID" type="text" indexed="true" stored="true" multiValued="true" />
+
+    <field name="SectionNumber" type="text" indexed="true" stored="true" />
+
+    <!-- TODO  make proper use of geo (it's now mostly string values) -->
+
+    <field name="Spatial" type="text" indexed="true" stored="true" />
+
+    <!-- SpatialAltitude       - Interval formatted like "[53.39 TO 53.39]" -->
+
+    <field name="SpatialArea" type="text" indexed="true" stored="true" />
+    <field name="SpatialCoordinates" type="text" indexed="true" stored="true" />
+    <field name="SpatialCRS" type="text" indexed="true" stored="true" />
+    <field name="SpatialData" type="text" indexed="true" stored="true" />
+    <field name="SpatialEnvelope" type="text" indexed="true" stored="true" />
+    <field name="SpatialGeometry" type="text" indexed="true" stored="true" />
+    <field name="SpatialPosition" type="text" indexed="true" stored="true" />
+    <field name="SpatialStyle" type="text" indexed="true" stored="true" />
+    <field name="SpatialUnion" type="location_rpt" indexed="true" stored="true" multiValued="true" />
+
+    <field name="Temporal" type="text" indexed="true" stored="true" />
+    <field name="Title" type="text" indexed="true" stored="true" />
+    <field name="Type" type="string" indexed="true" stored="true" />
   </fields>
 
-  <uniqueKey>identifier</uniqueKey>
-
-  <copyField source="title" dest="text" />
-  <copyField source="description" dest="text" />
-  <copyField source="fulltext" dest="text" />
-
+  <uniqueKey>IdentifierUUID</uniqueKey>
 </schema>

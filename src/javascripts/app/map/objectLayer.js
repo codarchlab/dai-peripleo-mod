@@ -90,9 +90,7 @@ define(['wellknown', 'events/events'], function(parse, Events) {
           var marker;
 
           if (geom.type === 'Point') {
-            marker = L.circleMarker([geom.coordinates[1], geom.coordinates[0]], Styles.POINT_RED);
-            marker.addTo(pointFeatures);
-            marker.setRadius(radius);
+            createPointMarker(geom.coordinates[1], geom.coordinates[0], radius);
           } else {
             marker = L.geoJson(geom, Styles.POLY_RED);
             marker.addTo(shapeFeatures);
@@ -101,13 +99,25 @@ define(['wellknown', 'events/events'], function(parse, Events) {
           return marker;
         },
 
+        createPointMarker = function(lon, lat, radius) {
+          marker = L.circleMarker([lat, lon], Styles.POINT_RED);
+          marker.setRadius(radius);
+          marker.addTo(pointFeatures);
+        },
+
         /** Updates the object layer with a new search response or view update **/
-        update = function(objects) {
+        update = function(docs) {
           // Just a dummy for now
           clearMap();
-          jQuery.each(objects, function(idx, obj) {
-            var geom = obj.geometry[0],
-                marker = createMarker(parse(geom), 4);
+
+          jQuery.each(docs, function(idx, doc) {
+            if (doc.SpatialCoordinates) {
+              var coords = doc.SpatialCoordinates.split(','),
+                  lon = parseFloat(coords[0].trim()),
+                  lat = parseFloat(coords[1].trim());
+
+              marker = createPointMarker(lon, lat, 4);
+            }
           });
 
           /*
