@@ -106,12 +106,12 @@
   <fields>
     <field name="_version_" type="long" indexed="true" stored="true"/>
 
-    <field name="Category" type="text" indexed="true" stored="true" />
+    <field name="Category" type="string" indexed="true" stored="true" />
     <field name="Contents" type="text" indexed="true" stored="true" multiValued="true" />
     <field name="Context" type="text" indexed="true" stored="true" />
     <field name="Contributor" type="text" indexed="true" stored="true" />
     <field name="Coverage" type="text" indexed="true" stored="true" />
-    <field name="Creator" type="text" indexed="true" stored="true" />
+    <field name="Creator" type="string" indexed="true" stored="true" />
 
     <!-- TODO  parse dates -->
 
@@ -130,7 +130,7 @@
     <field name="FormatLocked" type="int" indexed="true" stored="true" />
     <field name="FormatPreservedHeight" type="text" indexed="true" stored="true" />
     <field name="FormatSidelined" type="int" indexed="true" stored="true" />
-    <field name="FormatStatus" type="text" indexed="true" stored="true" />
+    <field name="FormatStatus" type="string" indexed="true" stored="true" />
     <field name="FormatTrashed" type="int" indexed="true" stored="true" />
     <field name="FormatThickness" type="text" indexed="true" stored="true" />
 
@@ -142,7 +142,7 @@
     <field name="Looking" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="LotGrid" type="string" indexed="true" stored="true" multiValued="true" />
 
-    <field name="Material" type="text" indexed="true" stored="true" />
+    <field name="Material" type="string" indexed="true" stored="true" />
 
     <field name="NotebookPage" type="int" indexed="true" stored="true" multiValued="true" />
 
@@ -175,7 +175,7 @@
     <field name="SpatialStyle" type="text" indexed="true" stored="true" />
     <field name="SpatialUnion" type="location_rpt" indexed="true" stored="true" multiValued="true" />
 
-    <field name="Temporal" type="text" indexed="true" stored="true" />
+    <field name="Temporal" type="string" indexed="true" stored="true" />
     <field name="Title" type="text" indexed="true" stored="true" />
     <field name="Type" type="string" indexed="true" stored="true" />
   </fields>
