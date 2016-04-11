@@ -48,6 +48,7 @@ define(['events/events', 'formatting'], function(Events, Formatting) {
     btnClear.hide();
 
     parentEl.append(chartEl);
+    chartEl.addClass('palette-col-' + parentEl.index());
 
     eventBroker.addHandler(Events.SOLR_SEARCH_RESPONSE, onSearchResponse);
   };
