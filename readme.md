@@ -27,7 +27,7 @@ request:
 curl http://localhost:8983/solr/peripleo/update?commit=true -d  '<delete><query>*:*</query></delete>'
 ```
 
-## Indexing the sample data
+## Indexing the sample PELAGIOS data
 
 The `data` folder contains a small sample dataset of 2.000 object records from the
 [Pelagios project](http://commons.pelagios.org). (The snippet below shows a sample data record.)
@@ -61,6 +61,11 @@ going to the `scripts` folder and typing `python indexTestdata.py`.
    "homepage":"http://numismatics.org/collection/1944.100.36391"
 }
 ```
+
+## Indexing iDIG data
+
+This repository does not include iDIG data (bring your own). The scripts folder, however, contains
+a script to convert iDIG's key:value format to JSON. (Work in progress.)
 
 ## Hacking on the Frontend
 

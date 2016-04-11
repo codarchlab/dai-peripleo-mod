@@ -14,6 +14,7 @@ def flattenList(source, target, property):
         target[property + '.' + key + '.' + str(idx)] = val
 
 with open('../data/items.json.txt') as f:
+ 
   for line in f.readlines():
     item = json.loads(line)
     converted = {
