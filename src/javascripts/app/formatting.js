@@ -5,12 +5,12 @@ define(function() {
 
   return {
 
-    createMeter: function(label, percentage) {
+    createMeter: function(label, count, percentage) {
       var row = jQuery(METER_TEMPLATE),
           bar = row.find('.bar');
 
       bar.css('width', percentage + '%');
-      bar.attr('title', percentage + '%');
+      bar.attr('title', count + ' Results');
       row.find('.label').html(label);
       return row;
     }

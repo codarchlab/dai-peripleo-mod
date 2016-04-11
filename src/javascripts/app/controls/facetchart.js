@@ -38,9 +38,10 @@ define(['events/events', 'formatting'], function(Events, Formatting) {
 
           jQuery.each(myFacet.slice(0, 5), function(idx, val) {
             var label = val[0],
-                percentage = 100 * val[1] / maxCount;
+                count = val[1],
+                percentage = 100 * count / maxCount;
 
-            facetBarsEl.append(Formatting.createMeter(label, percentage));
+            facetBarsEl.append(Formatting.createMeter(label, count, percentage));
           });
         };
 
