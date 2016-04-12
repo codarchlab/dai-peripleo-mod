@@ -13,9 +13,6 @@ def convertValue(key, val):
       return map(lambda v: int(v), val.split('\\n'))
     elif key.startswith('Relation'):
       return val.split('\\n')
-    elif key == 'SpatialAltitude':
-      fromTo = val.split(' TO ')
-      return { 'from': float(fromTo[0][1:].strip()), 'to': float(fromTo[1][:-1].strip()) }
     # elif key == 'SpatialData':
     #   return json.loads(val)
     elif key == 'SpatialUnion':

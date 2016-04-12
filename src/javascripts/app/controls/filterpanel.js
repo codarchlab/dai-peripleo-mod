@@ -1,4 +1,4 @@
-define(['controls/facetchart', 'events/events', 'velocity'], function(FacetChart, Events) {
+define(['controls/facetchart', 'controls/timehistogram', 'events/events', 'velocity'], function(FacetChart, TimeHistogram, Events) {
 
   var SLIDE_DURATION = 180;
 
@@ -6,6 +6,7 @@ define(['controls/facetchart', 'events/events', 'velocity'], function(FacetChart
         /** Slide-able body section **/
     var body = jQuery(
           '<div class="body">' +
+            '<div class="section timehistogram"></div>' +
             '<div data-facet="Category" class="section facet"></div>' +
             '<div data-facet="Type" class="section facet"></div>' +
             '<div data-facet="FormatStatus" class="section facet"></div>' +
@@ -23,6 +24,8 @@ define(['controls/facetchart', 'events/events', 'velocity'], function(FacetChart
           '</div>'),
 
         buttonToggleFilters = footer.find('.toggle-filters'),
+
+        histogram, // Initialized later
 
         /** Automatically creates facet charts & populates a lookup array based on DOM elements **/
         facetCharts = (function() {
@@ -53,6 +56,13 @@ define(['controls/facetchart', 'events/events', 'velocity'], function(FacetChart
                 buttonToggleFilters.addClass('open');
             }
           });
+        },
+
+        onSearchResponse = function(response) {
+          jQuery.each(facetCharts, function(idx, chart) {
+            chart.update(response);
+          });
+          histogram.update(response);
         };
 
     body.hide();
@@ -60,6 +70,10 @@ define(['controls/facetchart', 'events/events', 'velocity'], function(FacetChart
 
     containerNode.append(body);
     containerNode.append(footer);
+
+    histogram = new TimeHistogram(body.find('.timehistogram'), 'TemporalUTC', eventBroker);
+
+    eventBroker.addHandler(Events.SOLR_SEARCH_RESPONSE, onSearchResponse);
   };
 
   return FilterPanel;

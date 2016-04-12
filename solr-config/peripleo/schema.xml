@@ -27,6 +27,9 @@
     <!-- A Trie based date field for faster date range queries and date faceting. -->
     <fieldType name="tdate" class="solr.TrieDateField" precisionStep="6" positionIncrementGap="0"/>
 
+    <!-- Date range field -->
+    <fieldType name="daterange" class="solr.DateRangeField" />
+
     <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
     <fieldType name="binary" class="solr.BinaryField"/>
 
@@ -85,9 +88,7 @@
         <filter class="solr.PorterStemFilterFactory"/>
       </analyzer>
     </fieldType>
-
-    <fieldType name="ignored" stored="false" indexed="false" multiValued="true" class="solr.StrField" />
-
+9000
     <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
                spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
                geo="true" distErrPct="0.025" maxDistErr="0.001" distanceUnits="kilometers" />
@@ -106,6 +107,9 @@
   <fields>
     <field name="_version_" type="long" indexed="true" stored="true"/>
 
+    <field name="ArchiveNumber" type="string" indexed="true" stored="true" />
+    <field name="Buckets" type="string" indexed="true" stored="true" />
+
     <field name="Category" type="string" indexed="true" stored="true" />
     <field name="Contents" type="text" indexed="true" stored="true" multiValued="true" />
     <field name="Context" type="text" indexed="true" stored="true" />
@@ -119,14 +123,17 @@
     <field name="DateEarliest" type="text" indexed="true" stored="true" />
     <field name="DateLatest" type="text" indexed="true" stored="true" />
     <field name="DateTimeZone" type="text" indexed="true" stored="true" />
-    <field name="DateUTC" type="text" indexed="true" stored="true" />
+    <field name="DateUTC" type="string" indexed="true" stored="true" />
     <field name="Deposit" type="text" indexed="true" stored="true" />
     <field name="Description" type="text" indexed="true" stored="true" />
+
+    <field name="Features" type="text" indexed="true" stored="true" />
 
     <field name="Format" type="text" indexed="true" stored="true" />
     <field name="FormatDiameter" type="float" indexed="true" stored="true" />
     <field name="FormatImage" type="text" indexed="true" stored="true" />
     <field name="FormatImageHeight" type="text" indexed="true" stored="true" />
+    <field name="FormatImageWidth" type="text" indexed="true" stored="true" />
     <field name="FormatLocked" type="int" indexed="true" stored="true" />
     <field name="FormatPreservedHeight" type="text" indexed="true" stored="true" />
     <field name="FormatSidelined" type="int" indexed="true" stored="true" />
@@ -141,6 +148,9 @@
     <field name="Language" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="Looking" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="LotGrid" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="LotContexts" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="LotDates" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="LotStorage" type="string" indexed="true" stored="true" multiValued="true" />
 
     <field name="Material" type="string" indexed="true" stored="true" />
 
@@ -154,7 +164,9 @@
     <field name="RelationBelongsToUUID" type="text" indexed="true" stored="true" multiValued="true" />
     <field name="RelationIncludes" type="text" indexed="true" stored="true" multiValued="true" />
     <field name="RelationIncludesUUID" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="RelationIsAbove" type="text" indexed="true" stored="true" multiValued="true" />
     <field name="RelationIsAboveUUID" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="RelationIsBelow" type="text" indexed="true" stored="true" multiValued="true" />
     <field name="RelationIsBelowUUID" type="text" indexed="true" stored="true" multiValued="true" />
 
     <field name="SectionNumber" type="text" indexed="true" stored="true" />
@@ -166,6 +178,7 @@
     <!-- SpatialAltitude       - Interval formatted like "[53.39 TO 53.39]" -->
 
     <field name="SpatialArea" type="text" indexed="true" stored="true" />
+    <field name="SpatialAltitude" type="string" indexed="true" stored="true" />
     <field name="SpatialCoordinates" type="text" indexed="true" stored="true" />
     <field name="SpatialCRS" type="text" indexed="true" stored="true" />
     <field name="SpatialData" type="text" indexed="true" stored="true" />
@@ -176,6 +189,9 @@
     <field name="SpatialUnion" type="location_rpt" indexed="true" stored="true" multiValued="true" />
 
     <field name="Temporal" type="string" indexed="true" stored="true" />
+    <field name="TemporalEarliest" type="string" indexed="true" stored="true" />
+    <field name="TemporalLatest" type="string" indexed="true" stored="true" />
+    <field name="TemporalUTC" type="daterange" indexed="true" stored="true" />
     <field name="Title" type="text" indexed="true" stored="true" />
     <field name="Type" type="string" indexed="true" stored="true" />
   </fields>

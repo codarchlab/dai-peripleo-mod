@@ -1,5 +1,5 @@
 /** One 'facet dimension chart' block **/
-define(['events/events', 'formatting'], function(Events, Formatting) {
+define(['events/events', 'utils'], function(Events, Utils) {
 
   var FacetChart = function(parentEl, facetField, eventBroker) {
 
@@ -19,19 +19,8 @@ define(['events/events', 'formatting'], function(Events, Formatting) {
         btnClear = chartEl.find('.clear-filter'),
         facetBarsEl = chartEl.find('ul'),
 
-        chunkArray = function(arr, stepSize) {
-          var chunks = [],
-              i = 0,
-              n = arr.length;
-
-          while (i < n)
-            chunks.push(arr.slice(i, i += stepSize));
-
-          return chunks;
-        },
-
-        onSearchResponse = function(response) {
-          var myFacet = chunkArray(response.facet_counts.facet_fields[facetField], 2);
+        update = function(response) {
+          var myFacet = Utils.chunkArray(response.facet_counts.facet_fields[facetField], 2);
               maxCount = (myFacet.length > 0)? myFacet[0][1] : 0;
 
           facetBarsEl.empty();
@@ -41,7 +30,7 @@ define(['events/events', 'formatting'], function(Events, Formatting) {
                 count = val[1],
                 percentage = 100 * count / maxCount;
 
-            facetBarsEl.append(Formatting.createMeter(label, count, percentage));
+            facetBarsEl.append(Utils.createMeter(label, count, percentage));
           });
         };
 
@@ -51,7 +40,7 @@ define(['events/events', 'formatting'], function(Events, Formatting) {
     parentEl.append(chartEl);
     chartEl.addClass('palette-col-' + parentEl.index());
 
-    eventBroker.addHandler(Events.SOLR_SEARCH_RESPONSE, onSearchResponse);
+    this.update = update;
   };
 
   return FacetChart;
