@@ -215,15 +215,13 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
               var currentSelection = getSelectedRange(),
                   selectionNewFromX, selectionNewToX, // Updated selection bounds
                   maxValue = Math.max.apply(Math, jQuery.map(values, function(val) { return val[1]; })),
-                  minYear = values[0][0],
-                  maxYear = values[values.length - 1][0],
+                  minYear = new Date(values[0][0]),
+                  maxYear = new Date(values[values.length - 1][0]),
                   height = ctx.canvas.height - 1,
                   xOffset = 4,
                   drawingAreaWidth = ctx.canvas.width - 2 * xOffset,
                   barSpacing = Math.round(drawingAreaWidth / values.length),
                   barWidth = barSpacing - 4;
-
-              console.log(minYear, maxYear);
 
               histogramRange = { from: minYear, to: maxYear };
 
@@ -231,7 +229,7 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
               histogramFromLabel.html(Utils.formatYear(minYear));
               histogramToLabel.html(Utils.formatYear(maxYear));
 
-              if (minYear < 0 && maxYear > 0) {
+              if (minYear.getFullYear() < 0 && maxYear.getFullYear() > 0) {
                 histogramZeroLabel.show();
                 histogramZeroLabel[0].style.left = (yearToX(0) + canvasOffset - 35) + 'px';
               } else {

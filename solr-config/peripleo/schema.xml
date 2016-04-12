@@ -88,7 +88,7 @@
         <filter class="solr.PorterStemFilterFactory"/>
       </analyzer>
     </fieldType>
-9000
+
     <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
                spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
                geo="true" distErrPct="0.025" maxDistErr="0.001" distanceUnits="kilometers" />
@@ -194,7 +194,14 @@
     <field name="TemporalUTC" type="daterange" indexed="true" stored="true" />
     <field name="Title" type="text" indexed="true" stored="true" />
     <field name="Type" type="string" indexed="true" stored="true" />
+
+    <!-- The default text field for search - we'll copy in some stuff from other fields below -->
+    <field name="text" type="text" indexed="true" stored="false" multiValued="true" />
   </fields>
 
   <uniqueKey>IdentifierUUID</uniqueKey>
+
+  <copyField source="Title" dest="text" />
+  <copyField source="Description" dest="text" />
+
 </schema>
