@@ -1,0 +1,200 @@
+/** The result list **/
+define(['events/events'], function(Events) {
+
+  var SLIDE_DURATION = 180,
+
+      OPEN_DELAY = 380;
+
+  var ResultList = function(container, eventBroker) {
+
+    var element = jQuery(
+          '<div id="search-results">' +
+          '  <ul></ul>' +
+          '  <div id="wait-for-next"><img src="/images/wait-circle.gif"></div>' +
+          '</div>'),
+
+        /** DOM element shorthands **/
+        list = element.find('ul'),
+        waitForNextIndicator = element.find('#wait-for-next'),
+
+        /** Most recent search results **/
+        currentSearchResults = [],
+        currentSearchResultsTotal,
+
+        /**
+         * Helper that generates the appropriate icon span for a result.
+         *
+         * This will get more complex as we introduce more types in the future.
+         */
+        getIcon = function(result) {
+          if (result.object_type === 'Place')
+            return '<span class="icon" title="Place">&#xf041;</span>';
+          else
+            return '<span class="icon" title="Item">&#xf219;</span>';
+        },
+
+        /** Creates the HTML for a single search result entry **/
+        renderResult = function(result) {
+          var icon = getIcon(result),
+              html = '<li><h3>' + icon + result.title + '</h3>',
+              element;
+
+          if (result.temporal_bounds) {
+            html += '<p class="temp-bounds">';
+            if (result.temporal_bounds.start === result.temporal_bounds.end)
+              html += Formatting.formatYear(result.temporal_bounds.start);
+            else
+              html += Formatting.formatYear(result.temporal_bounds.start) + ' - ' + Formatting.formatYear(result.temporal_bounds.end);
+            html += '</p>';
+          }
+
+          if (result.names)
+            html += '<p class="names">' + result.names.slice(0, 8).join(', ') + '</p>';
+
+          if (result.description)
+            html += '<p class="description">' + result.description + '</p>';
+
+          if (result.object_type === 'Place') {
+            html += '<ul class="uris">' + Formatting.formatGazetteerURI(result.identifier);
+
+            if (result.matches)
+              jQuery.each(result.matches, function(idx, uri) {
+                  html += Formatting.formatGazetteerURI(uri);
+                });
+
+            html += '</ul>';
+          }
+
+          if (result.dataset_path)
+            html += '<p class="source">Source:' +
+                    ' <span data-id="' + result.dataset_path[0].id + '">' + result.dataset_path[0].title + '</span>' +
+                    '</p>';
+
+          // Add event handlers
+          element = jQuery(html + '</li>');
+          element.mouseenter(function() { eventBroker.fireEvent(Events.MOUSE_OVER_RESULT, result); });
+          element.mouseleave(function() { eventBroker.fireEvent(Events.MOUSE_OVER_RESULT); });
+          element.click(function() {
+            hide();
+            eventBroker.fireEvent(Events.SELECT_RESULT, [ result ]);
+          });
+
+          return element;
+        },
+
+        renderList = function(results, append) {
+          var moreAvailable = (currentSearchState === SearchState.SEARCH) ?
+                currentSearchResults.length < currentSearchResultsTotal :
+                currentSubsearchResults.length < currentSubsearchResultsTotal,
+
+              rows = jQuery.map(results, function(result) {
+                return renderResult(result);
+              });
+
+          if (!append)
+            list.empty();
+
+          list.append(rows);
+
+          if (moreAvailable)
+            waitForNextIndicator.show();
+          else
+            waitForNextIndicator.hide();
+        },
+
+        scrollTop = function() {
+          element.scrollTop(0);
+        },
+
+        /** If scrolled to bottom, we load the next result page if needed **/
+       onScroll = function() {
+          var scrollPos = element.scrollTop() + element.innerHeight(),
+              scrollBottom = element[0].scrollHeight,
+              loadedResults;
+
+          if (scrollPos >= scrollBottom) {
+            if (currentSearchState === SearchState.SEARCH) {
+              loadedResults = currentSearchResults.length;
+              if (currentSearchResultsTotal > loadedResults)
+                eventBroker.fireEvent(Events.LOAD_NEXT_PAGE, loadedResults);
+            } else {
+              loadedResults = currentSubsearchResults.length;
+              if (currentSubsearchResultsTotal > loadedResults)
+                eventBroker.fireEvent(Events.LOAD_NEXT_PAGE, loadedResults);
+            }
+          }
+        },
+
+        /** Hides the result list **/
+        hide = function() {
+          if (element.is(':visible'))
+            element.velocity('slideUp', { duration: SLIDE_DURATION });
+        },
+
+        /**
+         * Shows a list of results.
+         *
+         * The function will open the panel automatically if it is not yet open.
+         */
+        show = function(results, opt_delay) {
+          renderList(results);
+          if (element.is(':visible'))
+            scrollTop();
+          else
+            element.velocity('slideDown', { duration: SLIDE_DURATION, delay: opt_delay, complete: scrollTop });
+        },
+
+        /** API delivered the next page of search results **/
+        onNextPage = function(response) {
+          var moreAvailable = false;
+
+          if (currentSearchState === SearchState.SEARCH) {
+            currentSearchResults = currentSearchResults.concat(response.items);
+            if (currentSearchResults.length < response.total)
+              moreAvailable = true;
+          } else {
+            currentSubsearchResults = currentSubsearchResults.concat(response.items);
+            if (currentSubsearchResults.length < response.total)
+              moreAvailable = true;
+          }
+
+          renderList(response.items, true, moreAvailable);
+        };
+
+    element.scroll(onScroll);
+    element.hide();
+    waitForNextIndicator.hide();
+    container.append(element);
+
+    // View updates - like GMaps, we close when user resumes map browsing
+    eventBroker.addHandler(Events.VIEW_CHANGED, hide);
+
+    eventBroker.addHandler(Events.SOLR_SEARCH_RESPONSE, function(response) {
+      currentSearchResults = response.items;
+      currentSearchResultsTotal = response.total;
+
+      // TODO update control contents
+      // - If there's a query phrase -> open
+      // - If it's open, update
+
+    });
+
+    /* Next page of search results available
+    eventBroker.addHandler(Events.API_NEXT_PAGE, onNextPage);
+
+    // (De)selection via map
+    eventBroker.addHandler(Events.SELECT_MARKER, hide);
+
+    // Manual open/close events
+    eventBroker.addHandler(Events.SHOW_ALL_RESULTS, function() {
+      currentSearchState = SearchState.SEARCH;
+      show(currentSearchResults);
+    });
+    */
+
+    // eventBroker.addHandler(Events.HIDE_RESULTS, hide);
+  };
+
+  return ResultList;
+
+});
