@@ -62,23 +62,23 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
 
         /** Conversion function: x offset to year **/
         xToYear = function(x) {
-          var duration = histogramRange.to - histogramRange.from + 1,
+          var duration = histogramRange.to.getFullYear() - histogramRange.from.getFullYear() + 1,
               yearsPerPixel = duration / canvasWidth;
 
-          return Math.round(histogramRange.from + x * yearsPerPixel);
+          return Math.round(histogramRange.from.getFullYear() + x * yearsPerPixel);
         },
 
         /** Conversion function: year to x offset **/
         yearToX = function(year) {
-          var duration = histogramRange.to - histogramRange.from + 1,
+          var duration = histogramRange.to.getFullYear() - histogramRange.from.getFullYear() + 1,
               pixelsPerYear = canvasWidth / duration;
 
-          return Math.round((year - histogramRange.from) * pixelsPerYear);
+          return Math.round((year - histogramRange.from.getFullYear()) * pixelsPerYear);
         },
 
         /** Returns the currently selected time range **/
         getSelectedRange = function() {
-          if (!selectionRange) {
+          if (!selectionRange && histogramRange) {
             var xFrom = Math.max(0, selectionBounds.position().left) - canvasOffset,
                 yearFrom = xToYear(xFrom),
 
@@ -117,7 +117,7 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
 
             // Update handle label
             fromHandleLabel.show();
-            fromHandleLabel.html(Formatting.formatYear(xToYear(posX + handleWidth - canvasOffset)));
+            fromHandleLabel.html(Utils.formatYear(xToYear(posX + handleWidth - canvasOffset)));
 
             // Update selection bounds
             selectionBounds.css('left', posX + handleWidth);
@@ -137,7 +137,7 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
 
             // Update handle label
             toHandleLabel.show();
-            toHandleLabel.html(Formatting.formatYear(xToYear(posX - canvasOffset)));
+            toHandleLabel.html(Utils.formatYear(xToYear(posX - canvasOffset)));
 
             // Update selection bounds
             selectionBounds.css('width', posX - minX);
@@ -208,6 +208,8 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
         },
 
         update = function(response) {
+          console.log(response);
+          
           if (!ignoreUpdates) {
             // SOLR interleaves keys and values into one array
             var values = Utils.chunkArray(response.facet_counts.facet_ranges[facetField].counts, 2);
