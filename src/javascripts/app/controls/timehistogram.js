@@ -170,11 +170,11 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
           // Clear cached range
           selectionRange = false;
 
-          fromHandleLabel.html(Formatting.formatYear(fromYear));
+          fromHandleLabel.html(Utils.formatYear(fromYear));
           fromHandleLabel.show();
           fromHandle.css('left', offsetX - handleWidth + canvasOffset);
 
-          toHandleLabel.html(Formatting.formatYear(toYear));
+          toHandleLabel.html(Utils.formatYear(toYear));
           toHandleLabel.show();
           toHandle.css('left', offsetX + width + canvasOffset);
 
@@ -209,7 +209,7 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
 
         update = function(response) {
           console.log(response);
-          
+
           if (!ignoreUpdates) {
             // SOLR interleaves keys and values into one array
             var values = Utils.chunkArray(response.facet_counts.facet_ranges[facetField].counts, 2);
