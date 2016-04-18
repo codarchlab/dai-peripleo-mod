@@ -7,7 +7,7 @@ define(['events/events', '../utils'], function(Events, Utils) {
     var element = jQuery(
           '<div class="clicktrap">' +
             '<div class="filter-editor facetchart">' +
-              '<div class="btn select-all"><span class="icon">&#xf046;</span> <span class="label">All</span></div>' +
+              '<div class="btn select-all selected"><span class="icon">&#xf046;</span> <span class="label">All</span></div>' +
               '<div class="buttons">' +
                 '<span class="ok icon">&#xf058;</span>' +
                 '<span class="cancel icon">&#xf057;</span>' +
@@ -31,33 +31,47 @@ define(['events/events', '../utils'], function(Events, Utils) {
         facetField,
 
         selectAll = function() {
-          getSelectedValues();
-          select(list.find('li').not('.other'));
+          btnSelectAll.addClass('selected');
+          btnSelectAll.find('.icon').html('&#xf046;');
+          selectValue(list.find('li').not('.other'));
           selectOther();
         },
 
-        selectNone = function() {
-          deselect(list.find('li').not('.other'));
+        deselectAll = function() {
+          btnSelectAll.removeClass('selected');
+          btnSelectAll.find('.icon').html('&#xf096;');
+          deselectValue(list.find('li').not('.other'));
           deselectOther();
         },
 
-        select = function(element) {
+        toggleAll = function() {
+          if (btnSelectAll.hasClass('selected'))
+            deselectAll();
+          else
+            selectAll();
+        },
+
+        selectValue = function(element) {
           element.addClass('selected');
           element.find('.meter').css('opacity', 1);
           element.find('.icon').html('&#xf046;');
         },
 
-        deselect = function(element) {
+        deselectValue = function(element) {
+          // Deselecting a value also deselects the 'All' buttons
+          btnSelectAll.removeClass('selected');
+          btnSelectAll.find('.icon').html('&#xf096;');
+
           element.removeClass('selected');
           element.find('.meter').css('opacity', OPACITY_UNSELECTED);
           element.find('.icon').html('&#xf096;');
         },
 
-        toggle = function(element) {
+        toggleValue = function(element) {
           if (element.hasClass('selected'))
-            deselect(element);
+            deselectValue(element);
           else
-            select(element);
+            selectValue(element);
         },
 
         selectOther = function() {
@@ -119,7 +133,7 @@ define(['events/events', '../utils'], function(Events, Utils) {
             li.addClass('selected');
             li.attr('data-value', val.value);
             li.prepend('<span class="icon selection-toggle">&#xf046;</span>');
-            li.click(function() { toggle(li); });
+            li.click(function() { toggleValue(li); });
             list.append(li);
           });
 
@@ -127,17 +141,13 @@ define(['events/events', '../utils'], function(Events, Utils) {
           element.show();
         },
 
-        close = function() {
+        onOk = function() {
           // 'Inclusive' or 'exclusive' filtering? I.e. does the user want to
           // see selected categories AND others not in the list (inclusive)? Or
           // restrict to ONLY the selected ones (exclusive)?
           var inclusiveFiltering = isOtherSet(),
-              facets, searchParams;
-
-          if (inclusiveFiltering)
-            facets = getUnselectedValues(); // Inclusive: supress unselected items
-          else
-            facets = getSelectedValues(); // Exclusive: show only selected items
+              facets = (inclusiveFiltering) ? getUnselectedValues() : getSelectedValues(),
+              searchParams;
 
           // Sanitize 0-length filter value array to 'false'
           if (facets.length === 0)
@@ -145,22 +155,23 @@ define(['events/events', '../utils'], function(Events, Utils) {
 
           /*
           searchParams = FacetFilterParser.toSearchParams(dimension, facets, inclusiveFiltering);
-
           eventBroker.fireEvent(Events.FILTER_SETTINGS_CHANGED, { dimension: dimension, filters: searchParams });
           eventBroker.fireEvent(Events.SEARCH_CHANGED, searchParams);
           */
 
+          element.hide();
+        },
+
+        onCancel = function() {
           element.hide();
         };
 
     element.hide();
     jQuery(document.body).append(element);
 
-    /*
-    btnSelectAll.click(selectAll);
-    btnSelectNone.click(selectNone);
-    btnClose.click(close);
-    */
+    btnOk.click(onOk);
+    btnCancel.click(onCancel);
+    btnSelectAll.click(toggleAll);
 
     list.on('click', '.other', toggleOther);
 
