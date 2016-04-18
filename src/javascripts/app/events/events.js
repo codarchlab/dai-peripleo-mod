@@ -25,6 +25,9 @@ define(function() {
     /** The user has hidden the filters panel **/
     HIDE_FILTERS : 'hideFilters',
 
+    /** The user has clicked 'Set Filter' (or 'Refine') on a facet field **/
+    EDIT_FACET_FILTER : 'editFacetFilter',
+
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     /* Map-related UI events          */
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */

@@ -4,6 +4,7 @@ requirejs.config({
       "jquery": "../vendor/jquery-1.9.0.min",
       "jquery-ui": "../vendor/jquery-ui.min",
       "leaflet": "../vendor/leaflet/leaflet",
+      "numeral": "../vendor/numeral.min",
       "velocity": "../vendor/velocity.min",
       "wellknown": "../vendor/wellknown"
     },

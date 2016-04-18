@@ -1,4 +1,4 @@
-define(['controls/facetchart', 'controls/timehistogram', 'events/events', 'velocity'], function(FacetChart, TimeHistogram, Events) {
+define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram', 'events/events', 'velocity'], function(FacetChart, FilterEditor, TimeHistogram, Events) {
 
   var SLIDE_DURATION = 180;
 
@@ -36,6 +36,8 @@ define(['controls/facetchart', 'controls/timehistogram', 'events/events', 'veloc
             return new FacetChart(containerEl, facetField, eventBroker);
           });
         })(),
+
+        filterEditor = new FilterEditor(eventBroker),
 
         /** Slides the panel in or out **/
         togglePanel = function() {

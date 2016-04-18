@@ -208,8 +208,6 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
         },
 
         update = function(response) {
-          console.log(response);
-
           if (!ignoreUpdates) {
             // SOLR interleaves keys and values into one array
             var values = Utils.chunkArray(response.facet_counts.facet_ranges[facetField].counts, 2);

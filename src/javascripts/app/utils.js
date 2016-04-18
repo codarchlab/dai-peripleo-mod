@@ -1,4 +1,4 @@
-define(function() {
+define(['numeral'], function() {
 
   var METER_TEMPLATE =
       '<li><div class="meter"><div class="bar"></div><div class="label"></div></div></li>';
@@ -19,6 +19,10 @@ define(function() {
     formatYear: function(dateOrYear) {
       var year = (dateOrYear instanceof Date) ? dateOrYear.getFullYear() : dateOrYear;
       if (year < 0) return -year + ' BC'; else return year + ' AD';
+    },
+
+    formatNumber: function(n) {
+      return numeral(n).format('0,0');
     },
 
     createMeter: function(label, count, percentage) {
