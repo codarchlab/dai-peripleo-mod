@@ -17,8 +17,9 @@ define(['events/events', 'utils'], function(Events, Utils) {
         cssClass = 'palette-col-' + parentEl.index(),
 
         btnSetFilter = chartEl.find('.set-filter'),
-        btnRefine = chartEl.find('.refine-filter'),
-        btnClear = chartEl.find('.clear-filter'),
+        btnRefineFilter = chartEl.find('.refine-filter'),
+        btnClearFilter = chartEl.find('.clear-filter'),
+
         facetBarsEl = chartEl.find('ul'),
 
         currentFilter = false,
@@ -59,11 +60,32 @@ define(['events/events', 'utils'], function(Events, Utils) {
           return false;
         },
 
+        onClearFilter = function() {
+          currentFilters = false;
+          btnRefineFilter.hide();
+          btnClearFilter.hide();
+          btnSetFilter.show();
+
+          // Somewhat hacky syntax to clear a filter on a facetField
+          eventBroker.fireEvent(Events.SEARCH_CHANGED, { facetFilter: { facetField: facetField, values: false } });
+        },
+
         /** User changed the filter settings in the filter editor **/
         onFilterSettingsChanged = function(filterUpdate) {
           if (facetField === filterUpdate.facetField) {
             // Filter setting affects this facet!
             mergeFilters(filterUpdate);
+
+            if (currentFilter) {
+              btnSetFilter.hide();
+              btnRefineFilter.show();
+              btnClearFilter.show();
+            } else {
+              btnSetFilter.show();
+              btnRefineFilter.hide();
+              btnClearFilter.hide();
+            }
+
             eventBroker.fireEvent(Events.SEARCH_CHANGED, { facetFilter: currentFilter });
           }
         },
@@ -80,17 +102,19 @@ define(['events/events', 'utils'], function(Events, Utils) {
                 count = val[1],
                 percentage = 100 * count / maxCount;
 
-            facetBarsEl.append(Utils.createMeter(label, count, percentage));
+            if (count > 0)
+              facetBarsEl.append(Utils.createMeter(label, count, percentage));
           });
         };
 
-    btnRefine.hide();
-    btnClear.hide();
+    btnRefineFilter.hide();
+    btnClearFilter.hide();
 
     parentEl.append(chartEl);
     chartEl.addClass(cssClass);
 
     btnSetFilter.click(onSetFilter);
+    btnClearFilter.click(onClearFilter);
 
     eventBroker.addHandler(Events.FACET_FILTER_UPDATED, onFilterSettingsChanged);
 

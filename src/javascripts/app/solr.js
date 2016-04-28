@@ -51,14 +51,16 @@ define(['events/events', 'message'], function(Events, Message) {
             if (previousFilterIdx > -1)
               searchParams.facetFilters.splice(previousFilterIdx, 1);
 
-            searchParams.facetFilters.push(diff.facetFilter);
+            if (diff.facetFilter.values) // If values is falsy, we want the filter cleared
+              searchParams.facetFilters.push(diff.facetFilter);
           }
         },
 
         buildRequestURL = function() {
           // TODO make configurable
           var url = 'http://localhost:8983/solr/peripleo/query?rows=' + SEARCH_RESULT_ROWS +'&facet=true',
-              facetFilterClauses = []; // To hold the OR-connected facet filter clauses
+              showOnlyFilterClauses = [],
+              excludeFilterClauses = []; // To hold the OR-connected facet filter clauses
 
           if (searchParams.query)
             url += '&q=' + searchParams.query;
@@ -66,16 +68,29 @@ define(['events/events', 'message'], function(Events, Message) {
             url += '&q=*';
 
           if (searchParams.facetFilters.length > 0) {
+            // Collect all 'SHOW_ONLY' clauses
             jQuery.each(searchParams.facetFilters, function(i, filter) {
-              jQuery.each(filter.values, function(j, value) {
-                facetFilterClauses.push(filter.facetField + ':' + value);
-              });
+              if (filter.filterMode === 'SHOW_ONLY') {
+                jQuery.each(filter.values, function(j, value) {
+                  showOnlyFilterClauses.push(filter.facetField + ':' + encodeURIComponent('"' + value + '"'));
+                });
+              }
             });
 
-            if (facetFilterClauses.length > 1)
-              url += ' AND (' + facetFilterClauses.join(' OR ') + ')';
-            else
-              url += ' AND ' + facetFilterClauses[0];
+            // Collect all 'EXCLUDE' clauses
+            jQuery.each(searchParams.facetFilters, function(i, filter) {
+              if (filter.filterMode === 'EXCLUDE') {
+                jQuery.each(filter.values, function(j, value) {
+                  excludeFilterClauses.push(filter.facetField + ':' + encodeURIComponent('"' + value + '"'));
+                });
+              }
+            });
+
+            if (showOnlyFilterClauses.length > 0)
+              url += ' AND (' + showOnlyFilterClauses.join(' OR ') + ')';
+
+            if (excludeFilterClauses.length > 0)
+              url += ' AND NOT (' + excludeFilterClauses.join(' OR ') + ')';
           }
 
           url += jQuery.map(FACET_FIELDS, function(field) {
