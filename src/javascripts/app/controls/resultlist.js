@@ -30,6 +30,14 @@ define(['events/events'], function(Events) {
         currentResultsTotal,
 
         /**
+         * That's a bit hacky, but for style, we need to set the result list top position
+         * just below the search panel container (which can expand and collapse), so
+         * we'll grab a reference to it here. (I don't think there's a pure CSS solution
+         * to this.)
+         */
+        searchPanelContainer = jQuery('#searchpanel-container'),
+
+        /**
          * Helper that generates the appropriate icon span for a result.
          *
          * This will get more complex as we introduce more types in the future.
@@ -117,10 +125,13 @@ define(['events/events'], function(Events) {
         },
 
         toggleVisibility = function() {
-          var scrollTop = function() { element.scrollTop(0); };
+          // var top = searchPanelContainer.height(),
+          var  scrollToTop = function() { element.scrollTop(0); };
+
           if (!element.is(':visible')) {
             render(currentResultItems);
-            element.velocity('slideDown', { duration: SLIDE_DURATION, complete: scrollTop });
+            // element.css('top', top)
+            element.velocity('slideDown', { duration: SLIDE_DURATION, complete: scrollToTop });
           } else {
             element.velocity('slideUp', { duration: SLIDE_DURATION });
           }
