@@ -25,11 +25,21 @@ define(['events/events', 'utils'], function(Events, Utils) {
 
         facetValues = [],
 
+        /** JavaScript has no native feature to remove duplicates form an array - here's a helper **/
+        distinct = function(arr) {
+          var distinct = [];
+          jQuery.each(arr, function(idx, el) {
+            if (distinct.indexOf(el) === -1)
+              distinct.push(el);
+          });
+          return distinct;
+        },
+
         mergeFilters = function(filterUpdate) {
           if (currentFilter) {
             if (currentFilter.filterMode === 'EXCLUDE' && filterUpdate.filterMode === 'EXCLUDE') {
-              // Additional excludes - append the values
-              currentFilter.values = currentFilter.values.concat(filterUpdate.values);
+              // Additional excludes - append the values & eliminate duplicates
+              currentFilter.values = distinct(currentFilter.values.concat(filterUpdate.values));
             } else {
               // Two possibilities:
               // - filter update has mode SHOW_ONLY or
@@ -54,7 +64,7 @@ define(['events/events', 'utils'], function(Events, Utils) {
           if (facetField === filterUpdate.facetField) {
             // Filter setting affects this facet!
             mergeFilters(filterUpdate);
-            console.log(currentFilter);
+            eventBroker.fireEvent(Events.SEARCH_CHANGED, { facetFilter: currentFilter });
           }
         },
 

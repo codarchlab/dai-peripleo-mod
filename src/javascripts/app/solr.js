@@ -20,10 +20,42 @@ define(['events/events', 'message'], function(Events, Message) {
 
           query: false,
 
+          facetFilters: [],
+
           from: false,
 
           to: false
 
+        },
+
+        /** TODO this could be made a lot more generic **/
+        mergeParams = function(diff) {
+          if ('query' in diff) {
+            searchParams.query = diff.query;
+          }
+
+          if ('from' in diff || 'to' in diff) {
+            searchParams.from = diff.from;
+            searchParams.to = diff.to;
+          }
+
+          if ('facetFilter' in diff) {
+            var previousFilter = jQuery.grep(searchParams.facetFilters, function(filter) {
+                  return filter.facetField === diff.facetFilter.facetField;
+                }),
+
+                previousFilterIdx = (previousFilter.length > 0) ?
+                  searchParams.facetFilters.indexOf(previousFilter[0]) :
+                  -1;
+
+            // Remove previous filter setting, if any
+            if (previousFilterIdx > -1)
+              searchParams.facetFilters.splice(previousFilterIdx, 1);
+
+            searchParams.facetFilters.push(diff.facetFilter);
+
+            console.log(searchParams.facetFilters);
+          }
         },
 
         buildRequestURL = function() {
@@ -62,7 +94,7 @@ define(['events/events', 'message'], function(Events, Message) {
 
     eventBroker.addHandler(Events.SEARCH_CHANGED, function(diff) {
       // Merge the change with the current search params state
-      jQuery.extend(searchParams, diff);
+      mergeParams(diff);
       makeRequest();
     });
 
