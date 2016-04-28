@@ -116,10 +116,11 @@ define(['events/events', '../utils'], function(Events, Utils) {
           return element.find('.other').hasClass('selected');
         },
 
-        createList = function(facet) {
-          var field = facet.field,
-              values = facet.values,
+        render = function(facet) {
+          var values = facet.values,
               maxCount = (values.length > 0) ? values[0][1] : 0;
+
+          facetField = facet.field;
 
           clearList();
 
@@ -131,13 +132,14 @@ define(['events/events', '../utils'], function(Events, Utils) {
                 li = Utils.createMeter(val[0], tooltip, percentage);
 
             li.addClass('selected');
-            li.attr('data-value', val.value);
+            li.attr('data-value', val[0]);
             li.prepend('<span class="icon selection-toggle">&#xf046;</span>');
             li.click(function() { toggleValue(li); });
             list.append(li);
           });
 
           list.append(otherTemplate);
+          selectAll();
           element.show();
         },
 
@@ -145,19 +147,15 @@ define(['events/events', '../utils'], function(Events, Utils) {
           // 'Inclusive' or 'exclusive' filtering? I.e. does the user want to
           // see selected categories AND others not in the list (inclusive)? Or
           // restrict to ONLY the selected ones (exclusive)?
-          var inclusiveFiltering = isOtherSet(),
-              facets = (inclusiveFiltering) ? getUnselectedValues() : getSelectedValues(),
-              searchParams;
+          var filterMode = (isOtherSet()) ? 'EXCLUDE' : 'SHOW_ONLY',
+              values = (filterMode === 'SHOW_ONLY') ? getSelectedValues() : getUnselectedValues(),
+              filter = (values.length > 0) ? { facetField: facetField, filterMode: filterMode, values: values } : false;
 
-          // Sanitize 0-length filter value array to 'false'
-          if (facets.length === 0)
-            facets = false;
+          // TODO merge with pre-set filter?
 
-          /*
-          searchParams = FacetFilterParser.toSearchParams(dimension, facets, inclusiveFiltering);
-          eventBroker.fireEvent(Events.FILTER_SETTINGS_CHANGED, { dimension: dimension, filters: searchParams });
-          eventBroker.fireEvent(Events.SEARCH_CHANGED, searchParams);
-          */
+          // TODO fire event
+
+          console.log(filter);
 
           element.hide();
         },
@@ -175,7 +173,7 @@ define(['events/events', '../utils'], function(Events, Utils) {
 
     list.on('click', '.other', toggleOther);
 
-    eventBroker.addHandler(Events.EDIT_FACET_FILTER, createList);
+    eventBroker.addHandler(Events.EDIT_FACET_FILTER, render);
   };
 
   return FilterEditor;

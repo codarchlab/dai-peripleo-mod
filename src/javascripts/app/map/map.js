@@ -40,7 +40,7 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
         /** Map **/
         map = new L.Map(div, {
           center: new L.LatLng(41.893588, 12.488022),
-          zoom: 3,
+          zoom: 4,
           zoomControl: false,
           layers: [ currentLayer.layer ]
         }),
