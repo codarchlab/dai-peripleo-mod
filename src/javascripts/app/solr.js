@@ -56,7 +56,7 @@ define(['events/events', 'message'], function(Events, Message) {
           }
         },
 
-        buildRequestURL = function() {
+        buildRequestURL = function(offset) {
           // TODO make configurable
           var url = 'http://localhost:8983/solr/peripleo/query?rows=' + SEARCH_RESULT_ROWS +'&facet=true',
               showOnlyFilterClauses = [],
@@ -102,22 +102,32 @@ define(['events/events', 'message'], function(Events, Message) {
             '&facet.range=TemporalUTC&facet.range.start=NOW/YEAR-2000YEARS' +
             '&facet.range.end=NOW&facet.range.gap=%2B60YEARS';
 
+          if (offset)
+            url += '&start=' + offset;
+
           return url;
         },
 
         /** Just a dummy for testing purposes **/
-        makeRequest = function() {
-          jQuery.getJSON(buildRequestURL(), function(response) {
-            eventBroker.fireEvent(Events.SOLR_SEARCH_RESPONSE, response);
-          }).fail(function(response) {
-            console.log(response);
-            Message.error('No connection to SOLR backend.');
-          });
+        makeRequest = function(offset) {
+          return jQuery.getJSON(buildRequestURL(offset))
+            .fail(function(response) {
+              console.log(response);
+              Message.error('No connection to SOLR backend.');
+            });
         };
 
     eventBroker.addHandler(Events.SEARCH_CHANGED, function(diff) {
       mergeParams(diff);
-      makeRequest();
+      makeRequest().done(function(response) {
+        eventBroker.fireEvent(Events.SOLR_SEARCH_RESPONSE, response);
+      });
+    });
+
+    eventBroker.addHandler(Events.LOAD_NEXT_PAGE, function(offset) {
+      makeRequest(offset).done(function(response) {
+        eventBroker.fireEvent(Events.SOLR_NEXT_PAGE, response);
+      });
     });
 
   };

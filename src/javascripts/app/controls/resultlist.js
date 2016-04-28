@@ -129,22 +129,17 @@ define(['events/events'], function(Events) {
         onSearchResponse = function(response) {
           currentResultItems = response.response.docs;
           currentResultsTotal = response.response.numFound;
+
+          if (element.is(':visible')) {
+            element.scrollTop(0);
+            render(currentResultItems);
+          }
         },
 
         /** SOLR delivered the next page of search results **/
         onNextPage = function(response) {
-
-          // TODO implement
-
-          /*
-          var moreAvailable = false;
-
-          currentSearchResults = currentSearchResults.concat(response.items);
-          if (currentSearchResults.length < response.total)
-            moreAvailable = true;
-
-          render(response.items, true, moreAvailable);
-          */
+          currentResultItems = currentResultItems.concat(response.response.docs);
+          render(response.response.docs, true);
         },
 
         /** If scrolled to bottom, we load the next result page if needed **/
