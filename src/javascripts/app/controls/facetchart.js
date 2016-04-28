@@ -21,11 +21,41 @@ define(['events/events', 'utils'], function(Events, Utils) {
         btnClear = chartEl.find('.clear-filter'),
         facetBarsEl = chartEl.find('ul'),
 
+        currentFilter = false,
+
         facetValues = [],
 
+        mergeFilters = function(filterUpdate) {
+          if (currentFilter) {
+            if (currentFilter.filterMode === 'EXCLUDE' && filterUpdate.filterMode === 'EXCLUDE') {
+              // Additional excludes - append the values
+              currentFilter.values = currentFilter.values.concat(filterUpdate.values);
+            } else {
+              // Two possibilities:
+              // - filter update has mode SHOW_ONLY or
+              // - filter update has mode EXCLUDE & current filter is mode SHOW_ONLY
+              // In both cases, replace
+              currentFilter = filterUpdate;
+            }
+          } else {
+            // No filter set right now - replace
+            currentFilter = filterUpdate;
+          }
+        },
+
+        /** User clicked the 'Set Filter' button **/
         onSetFilter = function() {
-          eventBroker.fireEvent(Events.EDIT_FACET_FILTER,  { field: facetField, values: facetValues, cssClass: cssClass }); // { dimension: dimension, facets: facets, currentFilters: currentFilters });
+          eventBroker.fireEvent(Events.EDIT_FACET_FILTER,  { field: facetField, values: facetValues, cssClass: cssClass });
           return false;
+        },
+
+        /** User changed the filter settings in the filter editor **/
+        onFilterSettingsChanged = function(filterUpdate) {
+          if (facetField === filterUpdate.facetField) {
+            // Filter setting affects this facet!
+            mergeFilters(filterUpdate);
+            console.log(currentFilter);
+          }
         },
 
         update = function(response) {
@@ -51,6 +81,8 @@ define(['events/events', 'utils'], function(Events, Utils) {
     chartEl.addClass(cssClass);
 
     btnSetFilter.click(onSetFilter);
+
+    eventBroker.addHandler(Events.FACET_FILTER_UPDATED, onFilterSettingsChanged);
 
     this.update = update;
   };

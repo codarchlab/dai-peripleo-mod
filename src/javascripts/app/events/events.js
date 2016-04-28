@@ -28,6 +28,9 @@ define(function() {
     /** The user has clicked 'Set Filter' (or 'Refine') on a facet field **/
     EDIT_FACET_FILTER : 'editFacetFilter',
 
+    /** The user updated the filter settings for a facet **/
+    FACET_FILTER_UPDATED : 'facetFilterUpdated',
+
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     /* Map-related UI events          */
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */

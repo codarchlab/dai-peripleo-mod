@@ -151,12 +151,7 @@ define(['events/events', '../utils'], function(Events, Utils) {
               values = (filterMode === 'SHOW_ONLY') ? getSelectedValues() : getUnselectedValues(),
               filter = (values.length > 0) ? { facetField: facetField, filterMode: filterMode, values: values } : false;
 
-          // TODO merge with pre-set filter?
-
-          // TODO fire event
-
-          console.log(filter);
-
+          eventBroker.fireEvent(Events.FACET_FILTER_UPDATED, filter);
           element.hide();
         },
 
