@@ -113,7 +113,7 @@ define(['events/events', 'utils'], function(Events, Utils) {
     parentEl.append(chartEl);
     chartEl.addClass(cssClass);
 
-    btnSetFilter.click(onSetFilter);
+    btnSetFilter.add(btnRefineFilter).click(onSetFilter);
     btnClearFilter.click(onClearFilter);
 
     eventBroker.addHandler(Events.FACET_FILTER_UPDATED, onFilterSettingsChanged);

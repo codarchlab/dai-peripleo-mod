@@ -3,7 +3,15 @@ define(['events/events'], function(Events) {
 
   var SLIDE_DURATION = 180,
 
-      OPEN_DELAY = 380;
+      OPEN_DELAY = 380,
+
+      ICONS = {
+        'Artifact' : '&#xf219;',
+        'Context'  : '&#xf219;',
+        'Feature'  : '&#xf219;',
+        'Image'    : '&#xf219;',
+        'Section'  : '&#xf219;'
+      };
 
   var ResultList = function(container, eventBroker) {
 
@@ -18,8 +26,8 @@ define(['events/events'], function(Events) {
         waitForNextIndicator = element.find('#wait-for-next'),
 
         /** Most recent search results **/
-        currentSearchResults = [],
-        currentSearchResultsTotal,
+        currentResultItems = [],
+        currentResultsTotal,
 
         /**
          * Helper that generates the appropriate icon span for a result.
@@ -27,18 +35,24 @@ define(['events/events'], function(Events) {
          * This will get more complex as we introduce more types in the future.
          */
         getIcon = function(result) {
-          if (result.object_type === 'Place')
-            return '<span class="icon" title="Place">&#xf041;</span>';
-          else
-            return '<span class="icon" title="Item">&#xf219;</span>';
+          var icon = ICONS[result.Type];
+          if (!icon)
+            icon = '&#xf219;';
+          return '<span class="icon" title="Place">' + icon + '</span>';
         },
 
         /** Creates the HTML for a single search result entry **/
-        renderResult = function(result) {
-          var icon = getIcon(result),
-              html = '<li><h3>' + icon + result.title + '</h3>',
+        renderOneRow = function(item) {
+          var icon = getIcon(item),
+              html = '<li><h3>' + icon + item.Title + '</h3>',
               element;
 
+          console.log(item);
+
+          if (item.Description)
+            html += '<p class="description">' + item.Description.replace(/\\n/g, '<br/>') + '</p>';
+
+          /*
           if (result.temporal_bounds) {
             html += '<p class="temp-bounds">';
             if (result.temporal_bounds.start === result.temporal_bounds.end)
@@ -51,8 +65,7 @@ define(['events/events'], function(Events) {
           if (result.names)
             html += '<p class="names">' + result.names.slice(0, 8).join(', ') + '</p>';
 
-          if (result.description)
-            html += '<p class="description">' + result.description + '</p>';
+
 
           if (result.object_type === 'Place') {
             html += '<ul class="uris">' + Formatting.formatGazetteerURI(result.identifier);
@@ -69,26 +82,27 @@ define(['events/events'], function(Events) {
             html += '<p class="source">Source:' +
                     ' <span data-id="' + result.dataset_path[0].id + '">' + result.dataset_path[0].title + '</span>' +
                     '</p>';
+          */
 
           // Add event handlers
           element = jQuery(html + '</li>');
+
+          /*
           element.mouseenter(function() { eventBroker.fireEvent(Events.MOUSE_OVER_RESULT, result); });
           element.mouseleave(function() { eventBroker.fireEvent(Events.MOUSE_OVER_RESULT); });
           element.click(function() {
             hide();
             eventBroker.fireEvent(Events.SELECT_RESULT, [ result ]);
           });
+          */
 
           return element;
         },
 
-        renderList = function(results, append) {
-          var moreAvailable = (currentSearchState === SearchState.SEARCH) ?
-                currentSearchResults.length < currentSearchResultsTotal :
-                currentSubsearchResults.length < currentSubsearchResultsTotal,
-
-              rows = jQuery.map(results, function(result) {
-                return renderResult(result);
+        render = function(items, append) {
+          var moreAvailable = currentResultItems.length < currentResultsTotal,
+              rows = jQuery.map(items, function(item) {
+                return renderOneRow(item);
               });
 
           if (!append)
@@ -102,97 +116,59 @@ define(['events/events'], function(Events) {
             waitForNextIndicator.hide();
         },
 
-        scrollTop = function() {
-          element.scrollTop(0);
+        toggleVisibility = function() {
+          var scrollTop = function() { element.scrollTop(0); };
+          if (!element.is(':visible')) {
+            render(currentResultItems);
+            element.velocity('slideDown', { duration: SLIDE_DURATION, complete: scrollTop });
+          } else {
+            element.velocity('slideUp', { duration: SLIDE_DURATION });
+          }
+        },
+
+        onSearchResponse = function(response) {
+          currentResultItems = response.response.docs;
+          currentResultsTotal = response.response.numFound;
+        },
+
+        /** SOLR delivered the next page of search results **/
+        onNextPage = function(response) {
+
+          // TODO implement
+
+          /*
+          var moreAvailable = false;
+
+          currentSearchResults = currentSearchResults.concat(response.items);
+          if (currentSearchResults.length < response.total)
+            moreAvailable = true;
+
+          render(response.items, true, moreAvailable);
+          */
         },
 
         /** If scrolled to bottom, we load the next result page if needed **/
-       onScroll = function() {
+        onScroll = function() {
           var scrollPos = element.scrollTop() + element.innerHeight(),
               scrollBottom = element[0].scrollHeight,
-              loadedResults;
+              numResultsLoaded;
 
           if (scrollPos >= scrollBottom) {
-            if (currentSearchState === SearchState.SEARCH) {
-              loadedResults = currentSearchResults.length;
-              if (currentSearchResultsTotal > loadedResults)
-                eventBroker.fireEvent(Events.LOAD_NEXT_PAGE, loadedResults);
-            } else {
-              loadedResults = currentSubsearchResults.length;
-              if (currentSubsearchResultsTotal > loadedResults)
-                eventBroker.fireEvent(Events.LOAD_NEXT_PAGE, loadedResults);
-            }
+            numResultsLoaded = currentResultItems.length;
+            if (currentResultsTotal > numResultsLoaded)
+              eventBroker.fireEvent(Events.LOAD_NEXT_PAGE, numResultsLoaded);
           }
-        },
-
-        /** Hides the result list **/
-        hide = function() {
-          if (element.is(':visible'))
-            element.velocity('slideUp', { duration: SLIDE_DURATION });
-        },
-
-        /**
-         * Shows a list of results.
-         *
-         * The function will open the panel automatically if it is not yet open.
-         */
-        show = function(results, opt_delay) {
-          renderList(results);
-          if (element.is(':visible'))
-            scrollTop();
-          else
-            element.velocity('slideDown', { duration: SLIDE_DURATION, delay: opt_delay, complete: scrollTop });
-        },
-
-        /** API delivered the next page of search results **/
-        onNextPage = function(response) {
-          var moreAvailable = false;
-
-          if (currentSearchState === SearchState.SEARCH) {
-            currentSearchResults = currentSearchResults.concat(response.items);
-            if (currentSearchResults.length < response.total)
-              moreAvailable = true;
-          } else {
-            currentSubsearchResults = currentSubsearchResults.concat(response.items);
-            if (currentSubsearchResults.length < response.total)
-              moreAvailable = true;
-          }
-
-          renderList(response.items, true, moreAvailable);
         };
 
+    waitForNextIndicator.hide();
     element.scroll(onScroll);
     element.hide();
-    waitForNextIndicator.hide();
+
     container.append(element);
 
-    // View updates - like GMaps, we close when user resumes map browsing
-    eventBroker.addHandler(Events.VIEW_CHANGED, hide);
-
-    eventBroker.addHandler(Events.SOLR_SEARCH_RESPONSE, function(response) {
-      currentSearchResults = response.items;
-      currentSearchResultsTotal = response.total;
-
-      // TODO update control contents
-      // - If there's a query phrase -> open
-      // - If it's open, update
-
-    });
-
-    /* Next page of search results available
-    eventBroker.addHandler(Events.API_NEXT_PAGE, onNextPage);
-
-    // (De)selection via map
-    eventBroker.addHandler(Events.SELECT_MARKER, hide);
-
-    // Manual open/close events
-    eventBroker.addHandler(Events.SHOW_ALL_RESULTS, function() {
-      currentSearchState = SearchState.SEARCH;
-      show(currentSearchResults);
-    });
-    */
-
-    // eventBroker.addHandler(Events.HIDE_RESULTS, hide);
+    eventBroker.addHandler(Events.TOGGLE_RESULT_LIST, toggleVisibility);
+    eventBroker.addHandler(Events.SOLR_SEARCH_RESPONSE, onSearchResponse);
+    eventBroker.addHandler(Events.SOLR_NEXT_PAGE, onNextPage);
   };
 
   return ResultList;

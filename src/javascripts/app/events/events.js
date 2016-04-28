@@ -9,6 +9,9 @@ define(function() {
     /** SOLR returned a search result **/
     SOLR_SEARCH_RESPONSE : 'searchResponse',
 
+    /** SOLR delivered the next search result page **/
+    SOLR_NEXT_PAGE  : 'nextPage',
+
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     /* Search-related UI events       */
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
@@ -18,6 +21,9 @@ define(function() {
      * the search box or by changing the filter settings
      */
     SEARCH_CHANGED : 'searchChanged',
+
+    /** The user clicked on 'Results' to toggle the list **/
+    TOGGLE_RESULT_LIST : 'showResultList',
 
     /** The users has opened the filters panel **/
     SHOW_FILTERS : 'showFilters',
@@ -30,6 +36,9 @@ define(function() {
 
     /** The user updated the filter settings for a facet **/
     FACET_FILTER_UPDATED : 'facetFilterUpdated',
+
+    /** User scrolled to the bottom of the result list - load next page **/
+    LOAD_NEXT_PAGE : 'loadNextPage',
 
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     /* Map-related UI events          */

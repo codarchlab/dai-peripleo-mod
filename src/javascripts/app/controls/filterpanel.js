@@ -25,6 +25,7 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
           '</div>'),
 
         footerTotals = footer.find('.total'),
+        buttonToggleResults = footer.find('.list-results'),
         buttonToggleFilters = footer.find('.toggle-filters'),
 
         histogram, // Initialized later
@@ -40,6 +41,11 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
         })(),
 
         filterEditor = new FilterEditor(eventBroker),
+
+        /** Toggles the result list **/
+        toggleResults = function() {
+          eventBroker.fireEvent(Events.TOGGLE_RESULT_LIST);
+        },
 
         /** Slides the panel in or out **/
         togglePanel = function() {
@@ -72,6 +78,7 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
         };
 
     body.hide();
+    buttonToggleResults.click(toggleResults);
     buttonToggleFilters.click(togglePanel);
 
     containerNode.append(body);

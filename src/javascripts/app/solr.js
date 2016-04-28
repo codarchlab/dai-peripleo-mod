@@ -1,7 +1,7 @@
 define(['events/events', 'message'], function(Events, Message) {
 
       // Number of search results to fetch
-  var SEARCH_RESULT_ROWS = 100,
+  var SEARCH_RESULT_ROWS = 20,
 
       // TODO we'll want to make these configurable through UI later
       FACET_FIELDS = [
