@@ -1,14 +1,13 @@
 define(['events/events', 'message'], function(Events, Message) {
 
       // Number of search results to fetch
-  var SEARCH_RESULT_ROWS = 1000,
+  var SEARCH_RESULT_ROWS = 100,
 
       // TODO we'll want to make these configurable through UI later
       FACET_FIELDS = [
         'Category',
         'Type',
         'FormatStatus',
-        'Creator',
         'Temporal',
         'Material'
       ];

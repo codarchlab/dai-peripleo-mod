@@ -10,7 +10,6 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
             '<div data-facet="Category" class="section facet"></div>' +
             '<div data-facet="Type" class="section facet"></div>' +
             '<div data-facet="FormatStatus" class="section facet"></div>' +
-            '<div data-facet="Creator" class="section facet"></div>' +
             '<div data-facet="Temporal" class="section facet"></div>' +
             '<div data-facet="Material" class="section facet"></div>' +
           '</div>'),
@@ -18,11 +17,14 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
         /** Footer (remains visible when panel slides in) **/
         footer = jQuery(
           '<div class="footer">' +
-            '<span class="list-all"><span class="icon"></span> <span class="label"></span></span>' +
-            '<span class="total">&nbsp;</span>' +
+            '<span class="list-results">' +
+              '<span class="icon">&#xf03a;</span>' +
+              '<span class="total"></span>' +
+            '</span>' +
             '<span class="toggle-filters">Filters</span>' +
           '</div>'),
 
+        footerTotals = footer.find('.total'),
         buttonToggleFilters = footer.find('.toggle-filters'),
 
         histogram, // Initialized later
@@ -64,6 +66,8 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
           jQuery.each(facetCharts, function(idx, chart) {
             chart.update(response);
           });
+
+          footerTotals.html(response.response.numFound + ' Results');
           histogram.update(response);
         };
 
