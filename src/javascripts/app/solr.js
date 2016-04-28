@@ -53,20 +53,31 @@ define(['events/events', 'message'], function(Events, Message) {
               searchParams.facetFilters.splice(previousFilterIdx, 1);
 
             searchParams.facetFilters.push(diff.facetFilter);
-
-            console.log(searchParams.facetFilters);
           }
         },
 
         buildRequestURL = function() {
           // TODO make configurable
-          var url =
-            'http://localhost:8983/solr/peripleo/query?rows=' + SEARCH_RESULT_ROWS +'&facet=true';
+          var url = 'http://localhost:8983/solr/peripleo/query?rows=' + SEARCH_RESULT_ROWS +'&facet=true',
+              facetFilterClauses = []; // To hold the OR-connected facet filter clauses
 
           if (searchParams.query)
             url += '&q=' + searchParams.query;
           else
             url += '&q=*';
+
+          if (searchParams.facetFilters.length > 0) {
+            jQuery.each(searchParams.facetFilters, function(i, filter) {
+              jQuery.each(filter.values, function(j, value) {
+                facetFilterClauses.push(filter.facetField + ':' + value);
+              });
+            });
+
+            if (facetFilterClauses.length > 1)
+              url += ' AND (' + facetFilterClauses.join(' OR ') + ')';
+            else
+              url += ' AND ' + facetFilterClauses[0];
+          }
 
           url += jQuery.map(FACET_FIELDS, function(field) {
             return '&facet.field=' + field;
@@ -76,8 +87,6 @@ define(['events/events', 'message'], function(Events, Message) {
           url +=
             '&facet.range=TemporalUTC&facet.range.start=NOW/YEAR-2000YEARS' +
             '&facet.range.end=NOW&facet.range.gap=%2B60YEARS';
-
-
 
           return url;
         },
@@ -93,7 +102,6 @@ define(['events/events', 'message'], function(Events, Message) {
         };
 
     eventBroker.addHandler(Events.SEARCH_CHANGED, function(diff) {
-      // Merge the change with the current search params state
       mergeParams(diff);
       makeRequest();
     });
