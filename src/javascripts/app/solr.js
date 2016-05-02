@@ -171,7 +171,6 @@ define(['events/events', 'message'], function(Events, Message) {
               if (earliest !== latest) {
                 jQuery.getJSON(buildHistogramRequestURL(earliest, latest))
                   .done(function(response) {
-                    console.log(response);
                     eventBroker.fireEvent(Events.SOLR_TIME_HISTOGRAM, response);
                   })
                   .fail(function(error) {

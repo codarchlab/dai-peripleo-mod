@@ -90,7 +90,7 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
             if (yearFrom > yearTo)
               yearTo = yearFrom;
 
-            if (yearFrom > histogramRange.from || yearTo < histogramRange.to)
+            if (yearFrom > histogramRange.from.getFullYear() || yearTo < histogramRange.to.getFullYear())
               selectionRange = { from: yearFrom, to: yearTo };
           }
 
