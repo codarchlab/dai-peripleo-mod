@@ -12,6 +12,9 @@ define(function() {
     /** SOLR delivered the next search result page **/
     SOLR_NEXT_PAGE  : 'nextPage',
 
+    /** SOLR delivered an updated time histogram **/
+    SOLR_TIME_HISTOGRAM : 'timeHistogram',
+
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     /* Search-related UI events       */
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */

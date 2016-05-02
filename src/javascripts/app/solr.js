@@ -3,6 +3,8 @@ define(['events/events', 'message'], function(Events, Message) {
       // Number of search results to fetch
   var SEARCH_RESULT_ROWS = 40,
 
+      NUM_TIME_HISTOGRAM_BINS = 35,
+
       // TODO we'll want to make these configurable through UI later
       FACET_FIELDS = [
         'Category',
@@ -10,7 +12,10 @@ define(['events/events', 'message'], function(Events, Message) {
         'FormatStatus',
         'Temporal',
         'Material'
-      ];
+      ],
+
+      // TODO make this configurable, too
+      BASE_PATH = 'http://localhost:8983/solr/peripleo/query';
 
   var SOLR = function(eventBroker) {
 
@@ -27,7 +32,6 @@ define(['events/events', 'message'], function(Events, Message) {
 
         },
 
-        /** TODO this could be made a lot more generic **/
         mergeParams = function(diff) {
           if ('query' in diff) {
             searchParams.query = diff.query;
@@ -56,9 +60,9 @@ define(['events/events', 'message'], function(Events, Message) {
           }
         },
 
-        buildRequestURL = function(offset) {
-          // TODO make configurable
-          var url = 'http://localhost:8983/solr/peripleo/query?rows=' + SEARCH_RESULT_ROWS +'&facet=true',
+        /** Base URL captures commmon params for 'standard' and histogram request **/
+        buildBaseURL = function(offset) {
+          var url = BASE_PATH + '?facet=true',
               showOnlyFilterClauses = [],
               excludeFilterClauses = []; // To hold the OR-connected facet filter clauses
 
@@ -93,33 +97,74 @@ define(['events/events', 'message'], function(Events, Message) {
               url += ' AND NOT (' + excludeFilterClauses.join(' OR ') + ')';
           }
 
-          url += jQuery.map(FACET_FIELDS, function(field) {
-            return '&facet.field=' + field;
-          }).join('');
-
-          // TODO fix date facet request params
-          url +=
-            '&facet.range=TemporalUTC&facet.range.start=NOW/YEAR-2000YEARS' +
-            '&facet.range.end=NOW&facet.range.gap=%2B60YEARS';
-
           if (offset)
             url += '&start=' + offset;
 
           return url;
         },
 
+        /** Normal request is base URL plus rows, facets and stats parameter **/
+        buildRequestURL = function(offset) {
+          return buildBaseURL(offset) +
+                 '&stats=true&stats.field=TemporalEarliest&stats.field=TemporalLatest' +
+                 '&rows=' + SEARCH_RESULT_ROWS +
+                 jQuery.map(FACET_FIELDS, function(field) {
+                   return '&facet.field=' + field;
+                 }).join('');
+        },
+
+        /** Histogram request is base URL plus rows=0 and histogram params **/
+        buildHistogramRequestURL = function(startYear, endYear) {
+          var start = startYear + '-01-01T00:00:00Z',
+              end = endYear + '-12-31T23:59:59Z',
+              gap;
+
+          // Goal is 35 bins (for no other reason than aesthetics). But don't go
+          // below 1 bin = 1 year. In this case we rather want fewer bars.
+          gap = Math.round((endYear - startYear) / NUM_TIME_HISTOGRAM_BINS);
+          if (gap < 1)
+            gap = 1;
+
+          return buildBaseURL() +
+                 '&rows=0&facet.range=TemporalUTC' +
+                 '&facet.range.start=' + start +
+                 '&facet.range.end=' + end +
+                 '&facet.range.gap=%2B' + gap + 'YEARS';
+        },
+
         /** Just a dummy for testing purposes **/
         makeRequest = function(offset) {
           return jQuery.getJSON(buildRequestURL(offset))
-            .fail(function(response) {
-              console.log(response);
+            .fail(function(error) {
+              console.log(error);
               Message.error('No connection to SOLR backend.');
             });
+        },
+
+        makeTimeHistogramRequest = function(stats) {
+          var fieldEarliest = stats.stats_fields.TemporalEarliest,
+              fieldLatest = stats.stats_fields.TemporalLatest,
+              earliest = Math.min(fieldEarliest.min, fieldLatest.min),
+              latest = Math.max(fieldEarliest.max, fieldLatest.max);
+
+          // Only fetch the histogram if there is an interval
+          // Note: an undated response will result in earliest = latest = 0
+          if (earliest !== latest) {
+            jQuery.getJSON(buildHistogramRequestURL(earliest, latest))
+              .done(function(response) {
+                eventBroker.fireEvent(Events.SOLR_TIME_HISTOGRAM, response);
+              })
+              .fail(function(error) {
+                // Not fatal - just log
+                console.log(error);
+              });
+          }
         };
 
     eventBroker.addHandler(Events.SEARCH_CHANGED, function(diff) {
       mergeParams(diff);
       makeRequest().done(function(response) {
+        makeTimeHistogramRequest(response.stats);
         eventBroker.fireEvent(Events.SOLR_SEARCH_RESPONSE, response);
       });
     });

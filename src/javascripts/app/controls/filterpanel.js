@@ -74,7 +74,6 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
           });
 
           footerTotals.html(response.response.numFound + ' Results');
-          histogram.update(response);
         };
 
     body.hide();
