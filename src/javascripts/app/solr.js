@@ -3,7 +3,7 @@ define(['events/events', 'message'], function(Events, Message) {
       // Number of search results to fetch
   var SEARCH_RESULT_ROWS = 40,
 
-      NUM_TIME_HISTOGRAM_BINS = 35,
+      NUM_TIME_HISTOGRAM_BINS = 34,
 
       // TODO we'll want to make these configurable through UI later
       FACET_FIELDS = [
