@@ -2,7 +2,9 @@ define(['events/events', 'utils', 'draggable'], function(Events, Utils, Draggabl
 
   /** Constants **/
   var  BAR_STROKE = '#3182bd',
+
        BAR_FILL = '#6baed6',
+
        MIN_UPDATE_DELAY = 800;
 
   var TimeHistogram = function(parent, facetField, eventBroker) {
