@@ -120,8 +120,8 @@
     <!-- TODO  parse dates -->
 
     <field name="Date" type="text" indexed="true" stored="true" />
-    <field name="DateEarliest" type="text" indexed="true" stored="true" />
-    <field name="DateLatest" type="text" indexed="true" stored="true" />
+    <field name="DateEarliest" type="text" indexed="true" stored="true"/>
+    <field name="DateLatest" type="text" indexed="true" stored="true"/>
     <field name="DateTimeZone" type="text" indexed="true" stored="true" />
     <field name="DateUTC" type="string" indexed="true" stored="true" />
     <field name="Deposit" type="text" indexed="true" stored="true" />
@@ -189,8 +189,8 @@
     <field name="SpatialUnion" type="location_rpt" indexed="true" stored="true" multiValued="true" />
 
     <field name="Temporal" type="string" indexed="true" stored="true" />
-    <field name="TemporalEarliest" type="string" indexed="true" stored="true" />
-    <field name="TemporalLatest" type="string" indexed="true" stored="true" />
+    <field name="TemporalEarliest" type="int" indexed="true" stored="true" docValues="true" />
+    <field name="TemporalLatest" type="int" indexed="true" stored="true" docValues="true" />
     <field name="TemporalUTC" type="daterange" indexed="true" stored="true" />
     <field name="Title" type="text" indexed="true" stored="true" />
     <field name="Type" type="string" indexed="true" stored="true" />
