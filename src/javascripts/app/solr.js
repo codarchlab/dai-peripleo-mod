@@ -62,7 +62,7 @@ define(['events/events', 'message'], function(Events, Message) {
 
         /** Base URL captures commmon params for 'standard' and histogram request **/
         buildBaseURL = function(rows, offset) {
-          var url = BASE_PATH + '?rows=' + rows,
+          var url = BASE_PATH + '?defType=edismax&mm=100%25&q.alt=*:*&rows=' + rows,
               showOnlyFilterClauses = [],
               excludeFilterClauses = [];
 
@@ -71,8 +71,6 @@ define(['events/events', 'message'], function(Events, Message) {
 
           if (searchParams.query)
             url += '&q=' + searchParams.query;
-          else
-            url += '&q=*';
 
           if (searchParams.facetFilters.length > 0) {
             // Collect all 'SHOW_ONLY' clauses
