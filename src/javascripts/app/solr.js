@@ -64,7 +64,7 @@ define(['events/events', 'message'], function(Events, Message) {
         buildBaseURL = function(rows, offset) {
           var url = BASE_PATH + '?rows=' + rows,
               showOnlyFilterClauses = [],
-              excludeFilterClauses = []; // To hold the OR-connected facet filter clauses
+              excludeFilterClauses = [];
 
           if (offset)
             url += '&start=' + offset;
@@ -94,35 +94,40 @@ define(['events/events', 'message'], function(Events, Message) {
             });
 
             if (showOnlyFilterClauses.length > 0)
-              url += ' AND (' + showOnlyFilterClauses.join(' OR ') + ')';
+              url += '&fq=' + showOnlyFilterClauses.join(' OR ');
 
             if (excludeFilterClauses.length > 0)
-              url += ' AND NOT (' + excludeFilterClauses.join(' OR ') + ')';
+              url += '&fq=NOT (' + excludeFilterClauses.join(' OR ') + ')';
           }
 
           return url;
         },
 
-        /** Normal search request is base URL plus time filter and field facets **/
+        /** Normal search request is base URL plus time filter, field facets and timespan stats **/
         buildSearchRequestURL = function(offset) {
-          var url = buildBaseURL(SEARCH_RESULT_ROWS, offset);
+          var timeFilterClauses = [],
+              url = buildBaseURL(SEARCH_RESULT_ROWS, offset);
 
+          // Time filter
           if (searchParams.from)
-            url += 'AND TemporalLatest:[' + searchParams.from + ' TO *] ';
+            timeFilterClauses.push('TemporalLatest:[' + searchParams.from + ' TO *]');
 
           if (searchParams.to)
-            url += 'AND TemporalEarliest:[* TO ' + searchParams.to + ']';
+            timeFilterClauses.push('TemporalEarliest:[* TO ' + searchParams.to + ']');
 
-          return url + '&facet=true' +
+          if (timeFilterClauses.length > 0)
+            url += '&fq={!tag=time}' + timeFilterClauses.join(' AND ');
+
+          // Field facets
+          url += '&facet=true' +
             jQuery.map(FACET_FIELDS, function(field) {
               return '&facet.field=' + field;
             }).join('');
-        },
 
-        /** Stats request is base URL plus stats param **/
-        buildStatsRequestURL = function() {
-          return buildBaseURL(0) +
-            '&stats=true&stats.field=TemporalEarliest&stats.field=TemporalLatest';
+          // Stats (with time filter excluded)
+          return url +
+            '&stats=true&stats.field={!ex=time}TemporalEarliest' +
+            '&stats.field={!ex=time}TemporalLatest';
         },
 
         /** Histogram request is base URL plus time facet params **/
@@ -138,7 +143,7 @@ define(['events/events', 'message'], function(Events, Message) {
             gap = 1;
 
           return buildBaseURL(0) + '&facet=true' +
-                 '&rows=0&facet.range=TemporalUTC' +
+                 '&facet.range=TemporalUTC' +
                  '&facet.range.start=' + start +
                  '&facet.range.end=' + end +
                  '&facet.range.gap=%2B' + gap + 'YEARS';
@@ -158,37 +163,30 @@ define(['events/events', 'message'], function(Events, Message) {
          * - the first request fetches min/max years using SOLR stats
          * - the second requests retrieves the date range facets based for the min/max interval
          */
-        fetchTimeHistogram = function() {
-          jQuery.getJSON(buildStatsRequestURL())
-            .done(function(response) {
-              var fieldEarliest = response.stats.stats_fields.TemporalEarliest,
-                  fieldLatest = response.stats.stats_fields.TemporalLatest,
-                  earliest = Math.min(fieldEarliest.min, fieldLatest.min),
-                  latest = Math.max(fieldEarliest.max, fieldLatest.max);
+        makeHistogramRequest = function(stats) {
+          var fieldEarliest = stats.stats_fields.TemporalEarliest,
+              fieldLatest = stats.stats_fields.TemporalLatest,
+              earliest = Math.min(fieldEarliest.min, fieldLatest.min),
+              latest = Math.max(fieldEarliest.max, fieldLatest.max);
 
-              // Only fetch the histogram if there is an interval
-              // Note: an undated response will result in earliest = latest = 0
-              if (earliest !== latest) {
-                jQuery.getJSON(buildHistogramRequestURL(earliest, latest))
-                  .done(function(response) {
-                    eventBroker.fireEvent(Events.SOLR_TIME_HISTOGRAM, response);
-                  })
-                  .fail(function(error) {
-                    // Not fatal - just log
-                    console.log(error);
-                  });
-              }
-            })
-            .fail(function(error) {
-              // Not fatal - just log
-              console.log(error);
-            });
+          // Only fetch the histogram if there is an interval
+          // Note: an undated response will result in earliest = latest = 0
+          if (earliest !== latest) {
+            jQuery.getJSON(buildHistogramRequestURL(earliest, latest))
+              .done(function(response) {
+                eventBroker.fireEvent(Events.SOLR_TIME_HISTOGRAM, response);
+              })
+              .fail(function(error) {
+                // Not fatal - just log
+                console.log(error);
+              });
+          }
         };
 
     eventBroker.addHandler(Events.SEARCH_CHANGED, function(diff) {
       mergeParams(diff);
       makeSearchRequest().done(function(response) {
-        fetchTimeHistogram();
+        makeHistogramRequest(response.stats);
         eventBroker.fireEvent(Events.SOLR_SEARCH_RESPONSE, response);
       });
     });
