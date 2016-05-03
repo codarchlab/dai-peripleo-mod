@@ -62,6 +62,7 @@ define(['events/events', 'message'], function(Events, Message) {
 
         /** Base URL captures commmon params for 'standard' and histogram request **/
         buildBaseURL = function(rows, offset) {
+          // TODO we don't need q.alt in case searchParams.query is defined I guess
           var url = BASE_PATH + '?defType=edismax&mm=100%25&q.alt=*:*&rows=' + rows,
               showOnlyFilterClauses = [],
               excludeFilterClauses = [];
@@ -123,6 +124,7 @@ define(['events/events', 'message'], function(Events, Message) {
             }).join('');
 
           // Stats (with time filter excluded)
+          // TODO only add the {!ex=time} exclude if the time filter is actually set!
           return url +
             '&stats=true&stats.field={!ex=time}TemporalEarliest' +
             '&stats.field={!ex=time}TemporalLatest';
@@ -183,7 +185,11 @@ define(['events/events', 'message'], function(Events, Message) {
 
     eventBroker.addHandler(Events.SEARCH_CHANGED, function(diff) {
       mergeParams(diff);
+
+      // TODO introduce idle time, buffer changes, and fire max one request every N milliseconds
+
       makeSearchRequest().done(function(response) {
+        // TODO don't fetch histogram if the diff only affected the time filter
         makeHistogramRequest(response.stats);
         eventBroker.fireEvent(Events.SOLR_SEARCH_RESPONSE, response);
       });
