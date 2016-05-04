@@ -6,28 +6,28 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
         /** Map layers **/
     var Layers = {
 
-          dare : L.tileLayer('http://pelagios.org/tilesets/imperium/{z}/{x}/{y}.png', {
-                   attribution: 'Tiles: <a href="http://imperium.ahlfeldt.se/">DARE 2014</a>',
-                   minZoom:3,
-                   maxZoom:11
-                 }),
-
-          awmc : L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
-                   attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
-                     'Data &copy; <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors, CC-BY-SA | '+
-                     'Tiles and Data &copy; 2013 <a href="http://www.awmc.unc.edu" target="_blank">AWMC</a> ' +
-                     '<a href="http://creativecommons.org/licenses/by-nc/3.0/deed.en_US" target="_blank">CC-BY-NC 3.0</a>'
-                 }),
-
           osm  : L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	                 attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-                   maxZoom:30
+                   maxZoom:24
                  }),
 
-          satellite : L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicGVsYWdpb3MiLCJhIjoiMWRlODMzM2NkZWU3YzkxOGJkMDFiMmFiYjk3NWZkMmUifQ.cyqpSZvhsvBGEBwRfniVrg', {
-	                 attribution: '<a href="https://www.mapbox.com/about/maps/">&copy; Mapbox</a> <a href="http://www.openstreetmap.org/about/">&copy; OpenStreetMap</a>',
-                   maxZoom:22
-                 })
+          bthEast : L.tileLayer('http://localhost:8000/layers/bth-east/{z}/{x}/{y}.png', {
+	                 attribution: 'ASCSA',
+                   maxZoom:24,
+                   tms: true
+                 }),
+
+          bthWest : L.tileLayer('http://localhost:8000/layers/bth-west/{z}/{x}/{y}.png', {
+	                 attribution: 'ASCSA',
+                   maxZoom:24,
+                   tms: true
+                 }),
+
+          bz : L.tileLayer('http://localhost:8000/layers/bz/{z}/{x}/{y}.png', {
+  	             attribution: 'ASCSA',
+                 maxZoom:24,
+                 tms: true
+               })
 
         },
 
@@ -39,10 +39,10 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
 
         /** Map **/
         map = new L.Map(div, {
-          center: new L.LatLng(41.893588, 12.488022),
-          zoom: 4,
+          center: new L.LatLng(37.9763639796, 23.72278683), // new L.LatLng(41.893588, 12.488022),
+          zoom: 17,
           zoomControl: false,
-          layers: [ currentLayer.layer ]
+          layers: [ Layers.osm, Layers.bz, Layers.bthEast, Layers.bthWest ]
         }),
 
         objectLayer = new ObjectLayer(map, eventBroker),
