@@ -47,8 +47,6 @@ define(['events/events'], function(Events) {
               html = '<li><h3>' + icon + item.Title + '</h3>',
               element;
 
-          console.log(item);
-
           if (item.Description)
             html += '<p class="description">' + item.Description.replace(/\\n/g, '<br/>') + '</p>';
 

@@ -5,8 +5,9 @@ require([
   'controls/searchpanel',
   'controls/toolbar',
   'events/eventBroker',
+  'events/events',
   'map/map',
-  'solr'], function(jQuery, Leaflet, ResultList, SearchPanel, Toolbar, EventBroker, Map, SOLR) {
+  'solr'], function(jQuery, Leaflet, ResultList, SearchPanel, Toolbar, EventBroker, Events, Map, SOLR) {
 
   jQuery(document).ready(function() {
     var mapDiv = document.getElementById('map'),
@@ -21,6 +22,9 @@ require([
         resultList = new ResultList(controlsDiv, eventBroker),
 
         solr = new SOLR(eventBroker);
+
+    // Fire an initial search request
+    eventBroker.fireEvent(Events.SEARCH_CHANGED, { query: false });
   });
 
 });

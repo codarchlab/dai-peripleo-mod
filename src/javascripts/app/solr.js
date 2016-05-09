@@ -3,7 +3,11 @@ define(['events/events', 'message'], function(Events, Message) {
       // Number of search results to fetch
   var SEARCH_RESULT_ROWS = 40,
 
+      // Number of bars in the time histogram
       NUM_TIME_HISTOGRAM_BINS = 34,
+
+      // To throttle requests to SOLR we'll stay idle between requests for this time in millis
+      IDLE_DELAY_MS = 200,
 
       // TODO we'll want to make these configurable through UI later
       FACET_FIELDS = [
@@ -32,38 +36,60 @@ define(['events/events', 'message'], function(Events, Message) {
 
         },
 
-        mergeParams = function(diff) {
+        /** Indicates whether we're waiting for a SOLR response (or are in a force idle period) **/
+        busy = false,
+
+        /** A diff accumulated from requests that arrived during the busy period **/
+        pendingDiff = false,
+
+        mergeParams = function(diff, opt_mergeWith) {
+          var mergeWith = (opt_mergeWith) ? opt_mergeWith : searchParams,
+              previousFilter, previousFilterIdx;
+
           if ('query' in diff) {
-            searchParams.query = diff.query;
+            mergeWith.query = diff.query;
           }
 
           if ('from' in diff || 'to' in diff) {
-            searchParams.from = diff.from;
-            searchParams.to = diff.to;
+            mergeWith.from = diff.from;
+            mergeWith.to = diff.to;
           }
 
           if ('facetFilter' in diff) {
-            var previousFilter = jQuery.grep(searchParams.facetFilters, function(filter) {
-                  return filter.facetField === diff.facetFilter.facetField;
-                }),
+            if (!('facetFilters' in mergeWith))
+              mergeWith.facetFilters = [];
 
-                previousFilterIdx = (previousFilter.length > 0) ?
-                  searchParams.facetFilters.indexOf(previousFilter[0]) :
-                  -1;
+            previousFilter = jQuery.grep(mergeWith.facetFilters, function(filter) {
+              return filter.facetField === diff.facetFilter.facetField;
+            });
+
+            previousFilterIdx = (previousFilter.length > 0) ?
+              mergeWith.facetFilters.indexOf(previousFilter[0]) :
+              -1;
 
             // Remove previous filter setting, if any
             if (previousFilterIdx > -1)
-              searchParams.facetFilters.splice(previousFilterIdx, 1);
+              mergeWith.facetFilters.splice(previousFilterIdx, 1);
 
             if (diff.facetFilter.values) // If values is falsy, we want the filter cleared
-              searchParams.facetFilters.push(diff.facetFilter);
+              mergeWith.facetFilters.push(diff.facetFilter);
           }
+        },
+
+        /**
+         * Returns true if the diff contains only a change in the time interval. (We're
+         * using this below to decide whether we need to fetch a new time histogram.)
+         */
+        isTimeFilterChangeOnly = function(diff) {
+          var clonedDiff = jQuery.extend({}, diff);
+          delete clonedDiff.from;
+          delete clonedDiff.to;
+          return jQuery.isEmptyObject(clonedDiff);
         },
 
         /** Base URL captures commmon params for 'standard' and histogram request **/
         buildBaseURL = function(rows, offset) {
-          // TODO we don't need q.alt in case searchParams.query is defined I guess
-          var url = BASE_PATH + '?defType=edismax&mm=100%25&q.alt=*:*&rows=' + rows,
+          var url = BASE_PATH + '?defType=edismax&mm=100%25&rows=' + rows,
               showOnlyFilterClauses = [],
               excludeFilterClauses = [];
 
@@ -72,6 +98,8 @@ define(['events/events', 'message'], function(Events, Message) {
 
           if (searchParams.query)
             url += '&q=' + searchParams.query;
+          else
+            url += '&q.alt=*:*';
 
           if (searchParams.facetFilters.length > 0) {
             // Collect all 'SHOW_ONLY' clauses
@@ -181,18 +209,45 @@ define(['events/events', 'message'], function(Events, Message) {
                 console.log(error);
               });
           }
+        },
+
+        handlePending = function() {
+          if (pendingDiff) {
+            // Pending request? Query SOLR!
+            newRequest(pendingDiff);
+            pendingDiff = false;
+          } else {
+            // No request pending? Wait for IDLE_DELAY_MS
+            setTimeout(function() {
+              if (pendingDiff)
+                // New pending request
+                handlePending();
+              else
+                // Still no pending request - clear busy flag
+                busy = false;
+            }, IDLE_DELAY_MS);
+          }
+        },
+
+        newRequest = function(diff) {
+          makeSearchRequest().done(function(response) {
+            if (!isTimeFilterChangeOnly(diff))
+              makeHistogramRequest(response.stats);
+            eventBroker.fireEvent(Events.SOLR_SEARCH_RESPONSE, response);
+          }).always(handlePending);
         };
 
     eventBroker.addHandler(Events.SEARCH_CHANGED, function(diff) {
       mergeParams(diff);
-
-      // TODO introduce idle time, buffer changes, and fire max one request every N milliseconds
-
-      makeSearchRequest().done(function(response) {
-        // TODO don't fetch histogram if the diff only affected the time filter
-        makeHistogramRequest(response.stats);
-        eventBroker.fireEvent(Events.SOLR_SEARCH_RESPONSE, response);
-      });
+      if (busy) {
+        if (pendingDiff)
+          pendingDiff = mergeParams(diff, pendingDiff);
+        else
+          pendingDiff = diff;
+      } else {
+        busy = true;
+        newRequest(diff);
+      }
     });
 
     eventBroker.addHandler(Events.LOAD_NEXT_PAGE, function(offset) {

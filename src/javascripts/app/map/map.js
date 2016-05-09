@@ -42,7 +42,7 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
           center: new L.LatLng(37.9763639796, 23.72278683), // new L.LatLng(41.893588, 12.488022),
           zoom: 17,
           zoomControl: false,
-          layers: [ Layers.osm, Layers.bz, Layers.bthEast, Layers.bthWest ]
+          layers: [ Layers.osm /*, Layers.bz, Layers.bthEast, Layers.bthWest */ ]
         }),
 
         objectLayer = new ObjectLayer(map, eventBroker),
