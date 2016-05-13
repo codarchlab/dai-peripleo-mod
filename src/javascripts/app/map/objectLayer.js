@@ -90,7 +90,9 @@ define(['wellknown', 'events/events'], function(parse, Events) {
           var marker;
 
           if (geom.type === 'Point') {
-            createPointMarker(geom.coordinates[1], geom.coordinates[0], radius);
+            marker = L.circleMarker([geom.coordinates[1], geom.coordinates[0]], Styles.POINT_RED);
+            marker.setRadius(radius);
+            marker.addTo(pointFeatures);
           } else {
             marker = L.geoJson(geom, Styles.POLY_RED);
             marker.addTo(shapeFeatures);
@@ -99,62 +101,18 @@ define(['wellknown', 'events/events'], function(parse, Events) {
           return marker;
         },
 
-        createPointMarker = function(lon, lat, radius) {
-          marker = L.circleMarker([lat, lon], Styles.POINT_RED);
-          marker.setRadius(radius);
-          marker.addTo(pointFeatures);
-        },
-
         /** Updates the object layer with a new search response or view update **/
         update = function(docs) {
           // Just a dummy for now
           clearMap();
 
           jQuery.each(docs, function(idx, doc) {
-            if (doc.SpatialCoordinates) {
-              var coords = doc.SpatialCoordinates.split(','),
-                  lon = parseFloat(coords[0].trim()),
-                  lat = parseFloat(coords[1].trim());
-
-              marker = createPointMarker(lon, lat, 4);
+            if (doc.SpatialUnion) {
+              jQuery.each(doc.SpatialUnion, function(idx, wkt) {
+                createMarker(parse(wkt), 4);
+              });
             }
           });
-
-          /*
-            var id = obj.identifier,
-                existingObjectTuple = objectIndex[id],
-
-                geomHash = (obj.geo_bounds) ? createGeometryHash(obj.geometry) : false,
-                existingMarkerTuple = (geomHash) ? markerIndex[geomHash] : false,
-
-                type, marker;
-
-            if (geomHash) { // No need to bother if there is no geometry
-              collapseRectangles(obj); // Get rid of Barrington grid squares
-
-              if (existingObjectTuple) {
-                jQuery.extend(existingObjectTuple._1, obj); // Object exists - just update the data
-
-                if (existingObjectTuple._1.geometry.type === 'Point')
-                  existingObjectTuple._2.setRadius(size(obj.result_count));
-
-                existingObjectTuple._2.bringToFront();
-              } else {
-                if (existingMarkerTuple) { // There's a marker at that location already - add the object
-                  existingMarkerTuple._2.push(obj);
-                  marker = existingMarkerTuple._1;
-                  marker.setStyle(Styles.SMALL);
-                  marker.bringToFront();
-                } else { // Create and add a new marker
-                  marker = createMarker(obj, geomHash, size(obj.result_count));
-                }
-
-                markerIndex[geomHash] = { _1: marker, _2: [obj] };
-                objectIndex[id] = { _1: obj, _2: marker };
-              }
-            }
-
-          */
         };
 
     eventBroker.addHandler(Events.SOLR_SEARCH_RESPONSE, function(response) {
