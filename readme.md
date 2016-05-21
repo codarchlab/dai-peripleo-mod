@@ -1,6 +1,8 @@
-# DAI-SOLR-Playground
+# DAI-PERIPLEO SOLR Integration
 
-## Setting up solr
+A modified version of the Pelagios 'Peripleo' search UI that works on SOLR.
+
+## Setting up SOLR
 
 * Download and unzip SOLR.
 * You will need to create a new SOLR 'core' (we're going to name it 'peripleo'). Before you can do
@@ -11,7 +13,7 @@
   the folder `{your-solr-dir}/server/solr-webapp/webapps/WEB-INF/lib`.
 * Now start SOLR by typing `bin/solr start` and go to the admin interface at
   [http://localhost:8983](http://localhost:8983). (Note: you can stop SOLR by typing `bin/solr stop`).
-* Add the core in the 'Core' in the 'Core Admin' area.
+* Add the core in the 'Core Admin' area.
 * Your core should now be available. Test by going to
   [http://localhost:8983/solr/peripleo/select?q=*:*](http://localhost:8983/solr/peripleo/select?q=*:*),
   which should return an empty (but valid) XML response.
