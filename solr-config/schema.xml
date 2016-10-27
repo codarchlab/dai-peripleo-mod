@@ -40,6 +40,13 @@
       </analyzer>
     </fieldType>
 
+    <!-- A text field that only splits on whitespace for exact matching of words -->
+    <fieldType name="multivalue" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.PatternTokenizerFactory" pattern="\\n"/>
+      </analyzer>
+    </fieldType>
+
     <!-- A general text field that has reasonable, generic cross-language defaults -->
     <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
@@ -135,9 +142,16 @@
     
     <field name="CoverageGEO" type="coverage_geo" indexed="true" stored="true" />
     <field name="CoverageXYZ" type="coverage_xyz" indexed="true" stored="true" />
+
     <field name="CoverageUTC" type="daterange" indexed="true" stored="true" />
+    <field name="CoverageEarliest" type="int" indexed="true" stored="true" docValues="true" />
+    <field name="CoverageLatest" type="int" indexed="true" stored="true" docValues="true" />
+    
     <field name="DateUTC" type="daterange" indexed="true" stored="true" />
+    <field name="DateEarliest" type="date" indexed="true" stored="true" docValues="true" />
+    <field name="DateLatest" type="date" indexed="true" stored="true" docValues="true" />
     <field name="DateTimeZone" type="string" indexed="true" stored="true"/>
+    
     <field name="FormatImage" type="string" indexed="true" stored="true" />
     <field name="FormatImageHeight" type="string" indexed="true" stored="true" />
     <field name="FormatImageWidth" type="string" indexed="true" stored="true" />
@@ -149,13 +163,13 @@
 
     <field name="RelationAttachments" type="string" indexed="true" stored="true" multiValued="true" />
 
-    <field name="RelationBelongsToUUID" type="text_ws" indexed="true" stored="true" multiValued="true" />
-    <field name="RelationIncludesUUID" type="text_ws" indexed="true" stored="true" multiValued="true"/>
-    <field name="RelationIsAboveUUID" type="text_ws" indexed="true" stored="true" multiValued="true"/>
-    <field name="RelationIsBelowUUID" type="text_ws" indexed="true" stored="true" multiValued="true"/>
-    <field name="RelationIsAfterUUID" type="text_ws" indexed="true" stored="true" multiValued="true"/>
-    <field name="RelationIsBeforeUUID" type="text_ws" indexed="true" stored="true" multiValued="true"/>
-    <field name="RelationIsCoevalWithUUID" type="text_ws" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationBelongsToUUID" type="multivalue" indexed="true" stored="true" multiValued="true" />
+    <field name="RelationIncludesUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsAboveUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsBelowUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsAfterUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsBeforeUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsCoevalWithUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
 
     <field name="RightsTrashed" type="string" indexed="true" stored="true" />
     <field name="RightsDeleted" type="string" indexed="true" stored="true" />
