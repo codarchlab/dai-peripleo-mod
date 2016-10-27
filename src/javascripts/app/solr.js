@@ -13,8 +13,8 @@ define(['events/events', 'message'], function(Events, Message) {
       FACET_FIELDS = [
         'Category',
         'Type',
-        'FormatStatus',
-        'Temporal',
+        'RightsStatus',
+        'CoverageTemporal',
         'Material'
       ],
 
@@ -137,10 +137,10 @@ define(['events/events', 'message'], function(Events, Message) {
 
           // Time filter
           if (searchParams.from)
-            timeFilterClauses.push('TemporalLatest:[' + searchParams.from + ' TO *]');
+            timeFilterClauses.push('CoverageLatest:[' + searchParams.from + ' TO *]');
 
           if (searchParams.to)
-            timeFilterClauses.push('TemporalEarliest:[* TO ' + searchParams.to + ']');
+            timeFilterClauses.push('CoverageEarliest:[* TO ' + searchParams.to + ']');
 
           if (timeFilterClauses.length > 0)
             url += '&fq={!tag=time}' + timeFilterClauses.join(' AND ');
@@ -154,8 +154,8 @@ define(['events/events', 'message'], function(Events, Message) {
           // Stats (with time filter excluded)
           // TODO only add the {!ex=time} exclude if the time filter is actually set!
           return url +
-            '&stats=true&stats.field={!ex=time}TemporalEarliest' +
-            '&stats.field={!ex=time}TemporalLatest';
+            '&stats=true&stats.field={!ex=time}CoverageEarliest' +
+            '&stats.field={!ex=time}CoverageLatest';
         },
 
         /** Histogram request is base URL plus time facet params **/
@@ -192,8 +192,8 @@ define(['events/events', 'message'], function(Events, Message) {
          * - the second requests retrieves the date range facets based for the min/max interval
          */
         makeHistogramRequest = function(stats) {
-          var fieldEarliest = stats.stats_fields.TemporalEarliest,
-              fieldLatest = stats.stats_fields.TemporalLatest,
+          var fieldEarliest = stats.stats_fields.CoverageEarliest,
+              fieldLatest = stats.stats_fields.CoverageLatest,
               earliest = Math.min(fieldEarliest.min, fieldLatest.min),
               latest = Math.max(fieldEarliest.max, fieldLatest.max);
 

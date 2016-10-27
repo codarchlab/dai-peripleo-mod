@@ -9,8 +9,8 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
             '<div class="section timehistogram"></div>' +
             '<div data-facet="Category" class="section facet"></div>' +
             '<div data-facet="Type" class="section facet"></div>' +
-            '<div data-facet="FormatStatus" class="section facet"></div>' +
-            '<div data-facet="Temporal" class="section facet"></div>' +
+            '<div data-facet="RightsStatus" class="section facet"></div>' +
+            '<div data-facet="Coverage" class="section facet"></div>' +
             '<div data-facet="Material" class="section facet"></div>' +
           '</div>'),
 
@@ -83,7 +83,7 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
     containerNode.append(body);
     containerNode.append(footer);
 
-    histogram = new TimeHistogram(body.find('.timehistogram'), 'TemporalUTC', eventBroker);
+    histogram = new TimeHistogram(body.find('.timehistogram'), 'CoverageUTC', eventBroker);
 
     eventBroker.addHandler(Events.SOLR_SEARCH_RESPONSE, onSearchResponse);
   };
