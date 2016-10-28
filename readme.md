@@ -31,9 +31,8 @@ curl http://localhost:8983/solr/peripleo/update?commit=true -d  '<delete><query>
 
 ## Indexing iDIG data
 
-This repository does not include any sample iDIG data. For the time being, you'll need to bring
-your own. The `scripts` folder contains a Python script to convert iDIG's key:value format to
-JSON (`idig2json.py`) and a script for indexing the result file to SOLR (`indexData.py`).
+This repository includes a sample iDIG dataset in the `data` folder. The `scripts` folder contains
+a Python script to index this sample file into SOLR (`indexiDigJSON.py`).
 
 ## Hacking on the Frontend
 
