@@ -40,6 +40,13 @@
       </analyzer>
     </fieldType>
 
+    <!-- A text field that only splits on whitespace for exact matching of words -->
+    <fieldType name="multivalue" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.PatternTokenizerFactory" pattern="\\n"/>
+      </analyzer>
+    </fieldType>
+
     <!-- A general text field that has reasonable, generic cross-language defaults -->
     <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
@@ -89,6 +96,8 @@
       </analyzer>
     </fieldType>
 
+
+    
     <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
                spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
                geo="true" distErrPct="0.025" maxDistErr="0.001" distanceUnits="kilometers" />
@@ -102,113 +111,87 @@
                geo="true" distanceUnits="kilometers" numberType="_bbox_coord" />
     <fieldType name="_bbox_coord" class="solr.TrieDoubleField" precisionStep="8" docValues="true"
                stored="false"/>
+
+    <!-- WGS84 ~ 10 cm accuracy -->
+    <fieldType name="coverage_geo" class="solr.RptWithGeometrySpatialField"
+               spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
+               distanceUnits="degrees"
+               geo="true"
+               maxDistErr="0.000001"
+               distErrPct="0.10"
+               autoIndex="true"
+               validationRule="repairConvexHull"
+               />
+    
+    <!-- Meter Grid ~ 10 cm accuracy -->
+    <fieldType name="coverage_xyz" class="solr.RptWithGeometrySpatialField"
+               spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
+               distanceUnits="kilometers"
+               geo="false"
+               worldBounds="-10000 -10000 10000 10000"
+               maxDistErr="0.001"
+               distErrPct="0.10"
+               autoIndex="true"
+               validationRule="repairConvexHull"
+               />
+    
   </types>
 
   <fields>
     <field name="_version_" type="long" indexed="true" stored="true"/>
+    
+    <field name="CoverageGEO" type="coverage_geo" indexed="true" stored="true" />
+    <field name="CoverageXYZ" type="coverage_xyz" indexed="true" stored="true" />
 
-    <field name="ArchiveNumber" type="string" indexed="true" stored="true" />
-    <field name="BelowOther" type="string" indexed="true" stored="true" />
-    <field name="Buckets" type="string" indexed="true" stored="true" />
-    <field name="Category" type="string" indexed="true" stored="true" />
-    <field name="Contents" type="text" indexed="true" stored="true" multiValued="true" />
-    <field name="Context" type="text" indexed="true" stored="true" multiValued="true" />
-    <field name="Contributor" type="text" indexed="true" stored="true" multiValued="true" />
-    <field name="Creator" type="string" indexed="true" stored="true" />
+    <field name="CoverageUTC" type="daterange" indexed="true" stored="true" />
+    <field name="CoverageEarliest" type="int" indexed="true" stored="true" docValues="true" />
+    <field name="CoverageLatest" type="int" indexed="true" stored="true" docValues="true" />
+    
+    <field name="DateUTC" type="daterange" indexed="true" stored="true" />
+    <field name="DateEarliest" type="date" indexed="true" stored="true" docValues="true" />
+    <field name="DateLatest" type="date" indexed="true" stored="true" docValues="true" />
+    <field name="DateTimeZone" type="string" indexed="true" stored="true"/>
+    
+    <field name="FormatImage" type="string" indexed="true" stored="true" />
+    <field name="FormatImageHeight" type="string" indexed="true" stored="true" />
+    <field name="FormatImageWidth" type="string" indexed="true" stored="true" />
+    <field name="FormatImageAnnotations" type="string" indexed="true" stored="true" />
+    <field name="FormatImageTransformGEO" type="string" indexed="true" stored="true" />
+    <field name="FormatImageTransformXYZ" type="string" indexed="true" stored="true" />
 
-    <field name="CoverageGEO" type="text" indexed="true" stored="true" />
-    <field name="CoverageXYZ" type="text" indexed="true" stored="true" />
-    <field name="CoverageUTC" type="text" indexed="true" stored="true" />
-    <field name="CoverageCRS" type="text" indexed="true" stored="true" />
-    <field name="CoverageArea" type="text" indexed="true" stored="true" />
-    <field name="CoverageAltitude" type="text" indexed="true" stored="true" />
-    <field name="CoverageEarliest" type="text" indexed="true" stored="true" />
-    <field name="CoverageLatest" type="text" indexed="true" stored="true" />
-    <field name="CoveragePosition" type="text" indexed="true" stored="true" />
-    <field name="CoverageSpatial" type="text" indexed="true" stored="true" />
-    <field name="CoverageTemporal" type="text" indexed="true" stored="true" />
-    <field name="CoverageEnvelope" type="text" indexed="true" stored="true" />
-    <field name="CoverageSerialized" type="text" indexed="true" stored="true" />
-
-    <field name="Date" type="string" indexed="true" stored="true" />
-    <field name="DateUTC" type="string" indexed="true" stored="true" />
-    <field name="DateEarliest" type="text" indexed="true" stored="true"/>
-    <field name="DateEarliestISO8601" type="text" indexed="true" stored="true"/>
-    <field name="DateLatest" type="text" indexed="true" stored="true"/>
-    <field name="DateLatestISO8601" type="text" indexed="true" stored="true"/>
-    <field name="DateModified" type="text" indexed="true" stored="true"/>
-    <field name="DateTimeZone" type="text" indexed="true" stored="true"/>
-
-    <field name="Deposit" type="text" indexed="true" stored="true" multiValued="true" />
-    <field name="Description" type="text" indexed="true" stored="true" multiValued="true" />
-
-    <field name="Elevations" type="text" indexed="true" stored="true" />
-
-    <field name="Format" type="text" indexed="true" stored="true" />
-    <field name="FormatImage" type="text" indexed="true" stored="true" />
-    <field name="FormatImageHeight" type="text" indexed="true" stored="true" />
-    <field name="FormatImageWidth" type="text" indexed="true" stored="true" />
-    <field name="FormatImageAnnotations" type="text" indexed="true" stored="true" />
-    <field name="FormatImageTransformGEO" type="text" indexed="true" stored="true" />
-    <field name="FormatImageTransformXYZ" type="text" indexed="true" stored="true" />
-
-    <field name="Grid" type="string" indexed="true" stored="true" />
-
-    <field name="Identifier" type="string" indexed="true" stored="true" />
     <field name="IdentifierUUID" type="string" indexed="true" stored="true" required="true" />
 
-    <field name="InventoryNumber" type="string" indexed="true" stored="true" />
+    <field name="RelationAttachments" type="string" indexed="true" stored="true" multiValued="true" />
 
-    <field name="Looking" type="string" indexed="true" stored="true" multiValued="true" />
-    <field name="LotContexts" type="string" indexed="true" stored="true" />
-    <field name="LotDates" type="string" indexed="true" stored="true" />
-    <field name="LotGrid" type="string" indexed="true" stored="true" />
-    <field name="LotLevels" type="string" indexed="true" stored="true" />
-    <field name="LotStorage" type="string" indexed="true" stored="true" />
+    <field name="RelationBelongsToUUID" type="multivalue" indexed="true" stored="true" multiValued="true" />
+    <field name="RelationIncludesUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsAboveUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsBelowUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsAfterUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsBeforeUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
+    <field name="RelationIsCoevalWithUUID" type="multivalue" indexed="true" stored="true" multiValued="true"/>
 
-    <field name="Material" type="string" indexed="true" stored="true" multiValued="true" />
-    <field name="NotebookPage" type="string" indexed="true" stored="true" />
+    <field name="RightsTrashed" type="string" indexed="true" stored="true" />
+    <field name="RightsDeleted" type="string" indexed="true" stored="true" />
+    <field name="RightsLocked" type="string" indexed="true" stored="true" />
+    <field name="RightsSidelined" type="string" indexed="true" stored="true" />
+    <field name="RightsRating" type="string" indexed="true" stored="true" />
+    <field name="RightsStatus" type="string" indexed="true" stored="true" />
 
-    <field name="Period" type="text" indexed="true" stored="true" />
-    <field name="Phase" type="text" indexed="true" stored="true" />
-
-    <field name="Relation" type="text" indexed="true" stored="true" />
-    <field name="RelationAttachments" type="text" indexed="true" stored="true" multiValued="true" />
-    <field name="RelationBelongsTo" type="text" indexed="true" stored="true" />
-    <field name="RelationBelongsToUUID" type="text" indexed="true" stored="true" />
-    <field name="RelationIncludes" type="text" indexed="true" stored="true" />
-    <field name="RelationIncludesUUID" type="text" indexed="true" stored="true" />
-    <field name="RelationIsAbove" type="text" indexed="true" stored="true" />
-    <field name="RelationIsAboveUUID" type="text" indexed="true" stored="true" />
-    <field name="RelationIsBelow" type="text" indexed="true" stored="true" />
-    <field name="RelationIsBelowUUID" type="text" indexed="true" stored="true" />
-    <field name="RelationIsAfter" type="text" indexed="true" stored="true" />
-    <field name="RelationIsAfterUUID" type="text" indexed="true" stored="true" />
-    <field name="RelationIsBefore" type="text" indexed="true" stored="true" />
-    <field name="RelationIsBeforeUUID" type="text" indexed="true" stored="true" />
-    <field name="RelationIsCoevalWith" type="text" indexed="true" stored="true" />
-    <field name="RelationIsCoevalWithUUID" type="text" indexed="true" stored="true" />
-
-    <field name="RightsDeleted" type="text" indexed="true" stored="true" />
-    <field name="RightsTrashed" type="text" indexed="true" stored="true" />
-    <field name="RightsLocked" type="text" indexed="true" stored="true" />
-    <field name="RightsSidelined" type="text" indexed="true" stored="true" />
-    <field name="RightsRating" type="text" indexed="true" stored="true" />
-    <field name="RightsStatus" type="text" indexed="true" stored="true" />
-
-    <field name="SectionNumber" type="text" indexed="true" stored="true" />
-    <field name="Source" type="text" indexed="true" stored="true" />
-    <field name="Storage" type="text" indexed="true" stored="true" />
-    <field name="Title" type="text" indexed="true" stored="true" />
     <field name="Type" type="string" indexed="true" stored="true" />
     <field name="TypeName" type="string" indexed="true" stored="true" />
+
+    <field name="Title" type="text" indexed="true" stored="true" />
+    <field name="Description" type="text" indexed="true" stored="true" />
 
     <!-- The default text field for search - we'll copy in some stuff from other fields below -->
     <field name="text" type="text" indexed="true" stored="false" multiValued="true" />
   </fields>
 
   <uniqueKey>IdentifierUUID</uniqueKey>
-
+  
+  <dynamicField name="*" type="text" indexed="true" multiValued="true" stored="true"/>
+  
   <copyField source="Title" dest="text" />
   <copyField source="Description" dest="text" />
 
