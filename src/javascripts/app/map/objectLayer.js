@@ -107,11 +107,8 @@ define(['wellknown', 'events/events'], function(parse, Events) {
           clearMap();
           jQuery.each(docs, function(idx, doc) {
             if (doc.CoverageGEO) {
-              /*
-              jQuery.each(doc.CoverageGEO, function(idx, wkt) {
-                createMarker(parse(wkt), 4);
-              });
-              */
+              var geoJSON = parse(doc.CoverageGEO);
+              createMarker(geoJSON, 4);
             }
           });
         };
