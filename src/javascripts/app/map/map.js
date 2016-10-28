@@ -8,24 +8,18 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
 
           osm  : L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	                 attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-                   maxZoom:24
-                 }),
-
-          bthEast : L.tileLayer('http://localhost:8000/layers/bth-east/{z}/{x}/{y}.png', {
-	                 attribution: 'ASCSA',
-                   maxZoom:24,
-                   tms: true
+                   maxZoom:25
                  }),
 
           bthWest : L.tileLayer('http://localhost:8000/layers/bth-west/{z}/{x}/{y}.png', {
 	                 attribution: 'ASCSA',
-                   maxZoom:24,
+                   maxZoom:25,
                    tms: true
                  }),
 
           bz : L.tileLayer('http://localhost:8000/layers/bz/{z}/{x}/{y}.png', {
   	             attribution: 'ASCSA',
-                 maxZoom:24,
+                 maxZoom:25,
                  tms: true
                })
 
@@ -39,10 +33,10 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
 
         /** Map **/
         map = new L.Map(div, {
-          center: new L.LatLng(37.9763639796, 23.72278683), // new L.LatLng(41.893588, 12.488022),
+          center: new L.LatLng(37.9763639796, 23.72278683),
           zoom: 17,
           zoomControl: false,
-          layers: [ Layers.osm /*, Layers.bz, Layers.bthEast, Layers.bthWest */ ]
+          layers: [ Layers.osm, Layers.bz, Layers.bthWest ]
         }),
 
         objectLayer = new ObjectLayer(map, eventBroker),
