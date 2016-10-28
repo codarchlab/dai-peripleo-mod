@@ -105,12 +105,13 @@ define(['wellknown', 'events/events'], function(parse, Events) {
         update = function(docs) {
           // Just a dummy for now
           clearMap();
-
           jQuery.each(docs, function(idx, doc) {
             if (doc.CoverageGEO) {
+              /*
               jQuery.each(doc.CoverageGEO, function(idx, wkt) {
                 createMarker(parse(wkt), 4);
               });
+              */
             }
           });
         };

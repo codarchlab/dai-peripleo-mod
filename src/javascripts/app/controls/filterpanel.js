@@ -10,8 +10,6 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
             '<div data-facet="Category" class="section facet"></div>' +
             '<div data-facet="Type" class="section facet"></div>' +
             '<div data-facet="RightsStatus" class="section facet"></div>' +
-            '<div data-facet="Coverage" class="section facet"></div>' +
-            '<div data-facet="Material" class="section facet"></div>' +
           '</div>'),
 
         /** Footer (remains visible when panel slides in) **/

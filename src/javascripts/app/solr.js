@@ -13,9 +13,7 @@ define(['events/events', 'message'], function(Events, Message) {
       FACET_FIELDS = [
         'Category',
         'Type',
-        'RightsStatus',
-        'CoverageTemporal',
-        'Material'
+        'RightsStatus'
       ],
 
       // TODO make this configurable, too
