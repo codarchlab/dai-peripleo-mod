@@ -169,7 +169,7 @@ define(['events/events', 'message'], function(Events, Message) {
             gap = 1;
 
           return buildBaseURL(0) + '&facet=true' +
-                 '&facet.range=TemporalUTC' +
+                 '&facet.range=CoverageUTC' +
                  '&facet.range.start=' + start +
                  '&facet.range.end=' + end +
                  '&facet.range.gap=%2B' + gap + 'YEARS';
