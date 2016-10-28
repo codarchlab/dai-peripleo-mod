@@ -2,9 +2,7 @@ define(['events/events', 'message'], function(Events, Message) {
 
       // SOLR config
   var SOLR_HOST = 'localhost',
-  
       SOLR_PORT = 8983,
-      
       SOLR_CORE = 'peripleo',
       
       // Number of search results to fetch
@@ -23,7 +21,6 @@ define(['events/events', 'message'], function(Events, Message) {
         'RightsStatus'
       ],
 
-      // TODO make this configurable, too
       BASE_PATH = 'http://' + SOLR_HOST + ':' + SOLR_PORT + '/solr/' + SOLR_CORE + '/query';
 
   var SOLR = function(eventBroker) {
