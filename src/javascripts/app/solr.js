@@ -1,7 +1,14 @@
 define(['events/events', 'message'], function(Events, Message) {
 
+      // SOLR config
+  var SOLR_HOST = 'localhost',
+  
+      SOLR_PORT = 8983,
+      
+      SOLR_CORE = 'peripleo',
+      
       // Number of search results to fetch
-  var SEARCH_RESULT_ROWS = 40,
+      SEARCH_RESULT_ROWS = 40,
 
       // Number of bars in the time histogram
       NUM_TIME_HISTOGRAM_BINS = 34,
@@ -17,7 +24,7 @@ define(['events/events', 'message'], function(Events, Message) {
       ],
 
       // TODO make this configurable, too
-      BASE_PATH = 'http://localhost:8983/solr/peripleo/query';
+      BASE_PATH = 'http://' + SOLR_HOST + ':' + SOLR_PORT + '/solr/' + SOLR_CORE + '/query';
 
   var SOLR = function(eventBroker) {
 
