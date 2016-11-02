@@ -11,17 +11,16 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
                    maxZoom:25
                  }),
 
-          bthWest : L.tileLayer('http://localhost:8000/layers/bth-west/{z}/{x}/{y}.png', {
-	                 attribution: 'ASCSA',
-                   maxZoom:25,
-                   tms: true
-                 }),
+          googleSat : L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+            maxZoom: 25,
+            subdomains:['mt0','mt1','mt2','mt3']
+          }),
 
-          bz : L.tileLayer('http://localhost:8000/layers/bz/{z}/{x}/{y}.png', {
-  	             attribution: 'ASCSA',
-                 maxZoom:25,
-                 tms: true
-               })
+          sample : L.tileLayer('http://localhost:8000/layers/sample_west_2013/{z}/{x}/{y}.png', {
+	    attribution: 'ASCSA',
+            maxZoom:24,
+            tms: true
+          })
 
         },
 
@@ -36,7 +35,7 @@ define(['events/events', 'map/objectLayer'], function(Events, ObjectLayer) {
           center: new L.LatLng(37.9763639796, 23.72278683),
           zoom: 17,
           zoomControl: false,
-          layers: [ Layers.osm, Layers.bz, Layers.bthWest ]
+          layers: [ Layers.googleSat, Layers.sample ]
         }),
 
         objectLayer = new ObjectLayer(map, eventBroker),

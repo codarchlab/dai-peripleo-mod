@@ -80,21 +80,67 @@ define(['wellknown', 'events/events'], function(parse, Events) {
           shapeFeatures.clearLayers();
         },
 
+
+        /** Colors for Docs **/
+        colorForRGB = function(red, green, blue) {
+          return "rgb("+((red * 255) | 0)+","+((green * 255) | 0)+","+((blue * 255) | 0)+")";
+        },
+
+        colorForType = function(type) {
+          switch(type) {
+          case 'Feature': return colorForRGB(0.761,0.263,0.431); break;
+          case 'Context': return colorForRGB(0.878,0.357,0.094); break;
+          case 'Artifact': return colorForRGB(0.018,0.355,0.680); break;
+          case 'Section': return colorForRGB(0.502,0.353,0.498); break;
+          case 'Image': return colorForRGB(0.031,0.408,0.408); break;
+          case 'Group': return colorForRGB(0.859,0.667,0.125); break;
+          case 'Other': return colorForRGB(0.525,0.682,0.882); break;
+          default: return '#e75444';
+          }
+        },
+
         /**
          * Helper to create a marker.
          *
          * Used either as part of the update method, or when creating a selection
          * on a place that doesn't have a marker yet.
          */
-        createMarker = function(geom, radius) {
+        createMarker = function(doc, geom, radius) {
           var marker;
+          var style;
+          var color = colorForType(doc.Type);
 
           if (geom.type === 'Point') {
-            marker = L.circleMarker([geom.coordinates[1], geom.coordinates[0]], Styles.POINT_RED);
+            style = {
+              color : color,
+              opacity : 1,
+              fillColor : color,
+              fillOpacity : 0.5,
+              weight: 0.75,
+              radius: radius
+            };
+            marker = L.circleMarker([geom.coordinates[1], geom.coordinates[0]], style);
             marker.setRadius(radius);
             marker.addTo(pointFeatures);
+          } else if (geom.type == 'LineString' && doc.Type == 'Image') {
+            style = {
+              color : color,
+              opacity : 1,
+              fillColor : color,
+              fillOpacity : 0.5,
+              weight: 0.75
+            };
+            marker = L.circle([geom.coordinates[0][1], geom.coordinates[0][0]], 0.05, style);
+            marker.addTo(pointFeatures);
           } else {
-            marker = L.geoJson(geom, Styles.POLY_RED);
+            style = {
+              color : color,
+              opacity : 1,
+              fillColor : color,
+              fillOpacity : 0.12,
+              weight: 0.75
+            };
+            marker = L.geoJson(geom, style);
             marker.addTo(shapeFeatures);
           }
 
@@ -108,7 +154,10 @@ define(['wellknown', 'events/events'], function(parse, Events) {
           jQuery.each(docs, function(idx, doc) {
             if (doc.CoverageGEO) {
               var geoJSON = parse(doc.CoverageGEO);
-              createMarker(geoJSON, 4);
+              // GeometryCollections create pin markers so ignore them for now
+              if (geoJSON.type != 'GeometryCollection') {
+                createMarker(doc, geoJSON, 4);
+              }
             }
           });
         };
