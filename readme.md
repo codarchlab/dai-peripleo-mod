@@ -6,7 +6,7 @@ A modified version of the Pelagios 'Peripleo' search UI that works on SOLR.
 
 * Download and unzip SOLR.
 * You will need to create a new SOLR 'core' (we're going to name it 'peripleo'). Before you can do
-  this, copy the contents of the /solr/peripleo folder into a new folder inside your SOLR
+  this, copy the contents of the /solr-config/peripleo folder into a new folder inside your SOLR
   installation: `{your-solr-dir}/server/solr/peripleo`.
 * Our peripleo core will use spatial indexing. Therefore we must manually add the Java Topology
   Suite library dependency to our SOLR installation (sigh). Copy the file `solr/jts-1.13.jar` to
