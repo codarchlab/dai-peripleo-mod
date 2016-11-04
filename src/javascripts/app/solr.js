@@ -179,6 +179,15 @@ define(['events/events', 'message'], function(Events, Message) {
                  '&facet.range.gap=%2B' + gap + 'YEARS';
         },
 
+        buildBackgroundRequestURL = function(bounds) {
+          return buildBaseURL(SEARCH_RESULT_ROWS) +
+            '&q={!field f=FormatImageEnvelopeGEO score=overlapRatio}Intersects(ENVELOPE(' +
+            bounds.west + ',' +
+            bounds.east + ',' +
+            bounds.north + ',' +
+            bounds.south + '))';
+        },
+        
         /** Issues a standard search request **/
         makeSearchRequest = function(offset) {
           return jQuery.getJSON(buildSearchRequestURL(offset))

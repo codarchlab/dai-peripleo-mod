@@ -107,10 +107,12 @@
       special relevancy modes: score=overlapRatio|area|area2D (local-param to the query).
       DocValues is recommended for relevancy.
     -->
-    <fieldType name="bbox" class="solr.BBoxField"
-               geo="true" distanceUnits="kilometers" numberType="_bbox_coord" />
     <fieldType name="_bbox_coord" class="solr.TrieDoubleField" precisionStep="8" docValues="true"
                stored="false"/>
+    <fieldType name="bbox_geo" class="solr.BBoxField"
+               geo="true" distanceUnits="degrees" numberType="_bbox_coord" />
+    <fieldType name="bbox_xyz" class="solr.BBoxField"
+               geo="false" worldBounds="-10000 -10000 10000 10000" distanceUnits="kilometers" numberType="_bbox_coord" />
 
     <!-- WGS84 ~ 10 cm accuracy -->
     <fieldType name="coverage_geo" class="solr.RptWithGeometrySpatialField"
@@ -158,6 +160,9 @@
     <field name="FormatImageAnnotations" type="string" indexed="true" stored="true" />
     <field name="FormatImageTransformGEO" type="string" indexed="true" stored="true" />
     <field name="FormatImageTransformXYZ" type="string" indexed="true" stored="true" />
+
+    <field name="FormatImageEnvelopeGEO" type="bbox_geo" indexed="true" stored="true" />
+    <field name="FormatImageEnvelopeXYZ" type="bbox_xyz" indexed="true" stored="true" />
 
     <field name="IdentifierUUID" type="string" indexed="true" stored="true" required="true" />
 
