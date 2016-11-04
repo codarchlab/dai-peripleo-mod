@@ -16,9 +16,9 @@ define(['events/events', 'message'], function(Events, Message) {
 
       // TODO we'll want to make these configurable through UI later
       FACET_FIELDS = [
-        'Category',
         'Type',
-        'RightsStatus'
+        'Category',
+        'Material'
       ],
 
       BASE_PATH = 'http://' + SOLR_HOST + ':' + SOLR_PORT + '/solr/' + SOLR_CORE + '/query';

@@ -7,9 +7,9 @@ define(['controls/facetchart', 'controls/filtereditor', 'controls/timehistogram'
     var body = jQuery(
           '<div class="body">' +
             '<div class="section timehistogram"></div>' +
-            '<div data-facet="Category" class="section facet"></div>' +
             '<div data-facet="Type" class="section facet"></div>' +
-            '<div data-facet="RightsStatus" class="section facet"></div>' +
+            '<div data-facet="Category" class="section facet"></div>' +
+            '<div data-facet="Material" class="section facet"></div>' +
           '</div>'),
 
         /** Footer (remains visible when panel slides in) **/
